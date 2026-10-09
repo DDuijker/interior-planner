@@ -233,8 +233,9 @@ describe("generateWalls", () => {
     const wall = walls.find((w) => w.kind === "interior")!;
     expect(isHorizontal(wall.rect)).toBe(true);
     expect(wall.rooms).toEqual({ a: top.id, b: bottom.id });
-    const outer = walls.find((w) => w.kind === "exterior" && w.rect.y === -30)!;
-    expect(outer.rooms).toEqual({ b: top.id });
+    const outer = walls.filter((w) => w.kind === "exterior" && w.rect.y === -30);
+    // The corner pieces border no room; the middle part has the top room inside.
+    expect(outer.map((w) => w.rooms)).toEqual([{}, { b: top.id }, {}]);
   });
 
   it("17. keeps wall ids stable for unchanged geometry", () => {
@@ -243,6 +244,17 @@ describe("generateWalls", () => {
     const two = generateWalls(structuredClone(rooms)).map((w) => w.id);
     expect(one).toEqual(two);
     expect(wallId("interior", { x: 1, y: 2, w: 3, d: 4 })).toBe("w_i_1_2_3_4");
+  });
+
+  it("17b. splits a long wall where the room next to it changes", () => {
+    const rooms = [room([[0, 0, 300, 300]], "living", "l"), room([[300, 0, 200, 300]], "bed", "b")];
+    const top = generateWalls(rooms).filter((w) => w.kind === "exterior" && w.rect.y === -30);
+    expect(top.map((w) => [w.rect.x, w.rect.w, w.rooms.b])).toEqual([
+      [-30, 30, undefined],
+      [0, 300, "l"],
+      [300, 200, "b"],
+      [500, 30, undefined],
+    ]);
   });
 
   it("18. property: random rectangles always give non-overlapping walls", () => {

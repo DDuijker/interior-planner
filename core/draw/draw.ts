@@ -118,7 +118,7 @@ function intersect(s: Segment, t: Segment): Point | null {
  */
 export function facesFromSegments(segments: readonly Segment[], minArea = 1000): Point[][] {
   // 1. Split at intersections and at endpoints lying on other segments.
-  const cuts = segments.map((s) => [0, 1]);
+  const cuts = segments.map(() => [0, 1]);
   segments.forEach((s, i) =>
     segments.forEach((t, j) => {
       if (i >= j) return;

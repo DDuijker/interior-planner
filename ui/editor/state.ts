@@ -13,7 +13,26 @@ import { expandToGroups, getActiveVersion } from "@/core/model/actions";
 import type { Id, Project } from "@/core/model/types";
 import type { Camera } from "@/core/editor/camera";
 
-export type Tool = "select" | "pan" | "measure";
+export type Tool =
+  | "select"
+  | "pan"
+  | "measure"
+  | "room-rect"
+  | "room-l"
+  | "room-poly"
+  | "wall"
+  | "door"
+  | "window"
+  | "passage"
+  | "scale-ref";
+
+export type View = "plan" | "3d" | "style" | "photos";
+
+/** A wall side picked in 2D or 3D (E09-50, E06-29). */
+export interface WallPick {
+  wallId: Id;
+  side: "a" | "b";
+}
 
 export interface EditorState {
   history: History<Project>;
@@ -23,6 +42,13 @@ export interface EditorState {
   showGrid: boolean;
   showLabels: boolean;
   showMinimap: boolean;
+  view: View;
+  wall: WallPick | null;
+  room: Id | null;
+  /** Selected door, window or passage. */
+  opening: Id | null;
+  /** Show the floor below as a ghost in 2D. */
+  ghost: boolean;
 }
 
 export type EditorAction =
@@ -35,7 +61,11 @@ export type EditorAction =
   | { type: "select"; ids: Id[]; additive?: boolean }
   | { type: "tool"; tool: Tool }
   | { type: "camera"; camera: Camera }
-  | { type: "toggle"; key: "showGrid" | "showLabels" | "showMinimap" }
+  | { type: "toggle"; key: "showGrid" | "showLabels" | "showMinimap" | "ghost" }
+  | { type: "view"; view: View }
+  | { type: "pickWall"; wall: WallPick | null }
+  | { type: "pickRoom"; room: Id | null }
+  | { type: "pickOpening"; opening: Id | null }
   | { type: "load"; project: Project };
 
 export function initialEditorState(project: Project): EditorState {
@@ -47,6 +77,11 @@ export function initialEditorState(project: Project): EditorState {
     showGrid: true,
     showLabels: true,
     showMinimap: true,
+    view: "plan",
+    wall: null,
+    room: null,
+    opening: null,
+    ghost: true,
   };
 }
 
@@ -83,7 +118,10 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
     case "select": {
       const items = getActiveVersion(state.history.present).items;
       const ids = expandToGroups(items, action.ids);
-      if (!action.additive) return { ...state, selection: ids };
+      if (!action.additive) {
+        if (!ids.length) return { ...state, selection: ids };
+        return { ...state, selection: ids, wall: null, room: null, opening: null };
+      }
       // Shift-click toggles: remove if everything is already selected.
       const current = new Set(state.selection);
       const allIn = ids.length > 0 && ids.every((id) => current.has(id));
@@ -99,6 +137,32 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
       return { ...state, camera: action.camera };
     case "toggle":
       return { ...state, [action.key]: !state[action.key] };
+    case "view":
+      return { ...state, view: action.view };
+    case "pickWall":
+      return {
+        ...state,
+        wall: action.wall,
+        room: null,
+        opening: null,
+        selection: action.wall ? [] : state.selection,
+      };
+    case "pickRoom":
+      return {
+        ...state,
+        room: action.room,
+        wall: null,
+        opening: null,
+        selection: action.room ? [] : state.selection,
+      };
+    case "pickOpening":
+      return {
+        ...state,
+        opening: action.opening,
+        wall: null,
+        room: null,
+        selection: action.opening ? [] : state.selection,
+      };
     case "load":
       return { ...state, history: reset(state.history, action.project), selection: [] };
   }

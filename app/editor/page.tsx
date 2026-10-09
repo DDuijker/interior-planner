@@ -4,11 +4,11 @@ import { useMemo } from "react";
 import { addItem } from "@/core/model/actions";
 import type { Project } from "@/core/model/types";
 import { sampleApartment } from "@/core/samples/apartment";
-import { Editor } from "@/ui/editor/Editor";
+import { Workspace } from "@/ui/workspace/Workspace";
 
 /**
  * `?stress=150` adds that many chairs for performance checks (E03-12).
- * Projects and import come later (E07, E10); for now the sample plan opens.
+ * This route is a demo: nothing is saved. Real projects open at /project/.
  */
 function withStress(project: Project): Project | null {
   const n = Number(new URLSearchParams(window.location.search).get("stress"));
@@ -36,5 +36,5 @@ function withStress(project: Project): Project | null {
 
 export default function EditorPage() {
   const project = useMemo(() => sampleApartment(), []);
-  return <Editor initial={project} prepare={withStress} />;
+  return <Workspace initial={project} prepare={withStress} />;
 }

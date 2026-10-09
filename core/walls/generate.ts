@@ -317,27 +317,67 @@ export function generateWalls(
   const grid = rasterize(rooms, extraWalls, opts);
   if (grid.cols === 0) return [];
   classify(grid, rooms, extraWalls, opts);
-  const half = grid.cell / 2;
-  return mergeCells(grid).map(({ rect, cls }) => {
+  const out: Wall[] = [];
+  for (const { rect, cls } of mergeCells(grid)) {
     const kind = KIND_BY_CLASS[cls]!;
-    const sides = isHorizontal(rect)
+    // Split the wall where the room on either side changes, so every wall
+    // segment borders at most one room per side (finishes are per room).
+    for (const part of splitBySides(grid, rooms, rect)) {
+      const roomsBySide: Wall["rooms"] = {};
+      if (part.a) roomsBySide.a = part.a;
+      if (part.b) roomsBySide.b = part.b;
+      out.push({
+        id: wallId(kind, part.rect),
+        rect: part.rect,
+        kind,
+        height: kind === "low" ? opts.lowHeight : opts.height,
+        rooms: roomsBySide,
+      });
+    }
+  }
+  return out;
+}
+
+function splitBySides(
+  grid: WallGrid,
+  rooms: readonly Room[],
+  rect: Rect,
+): { rect: Rect; a?: Id; b?: Id }[] {
+  const { cell } = grid;
+  const half = cell / 2;
+  const horizontal = isHorizontal(rect);
+  const length = horizontal ? rect.w : rect.d;
+  const steps = Math.max(1, Math.round(length / cell));
+  const sideAt = (i: number) => {
+    const along = (horizontal ? rect.x : rect.y) + (i + 0.5) * cell;
+    return horizontal
       ? {
-          a: roomAt(grid, rooms, rect.x + rect.w / 2, rect.y - half),
-          b: roomAt(grid, rooms, rect.x + rect.w / 2, rect.y + rect.d + half),
+          a: roomAt(grid, rooms, along, rect.y - half),
+          b: roomAt(grid, rooms, along, rect.y + rect.d + half),
         }
       : {
-          a: roomAt(grid, rooms, rect.x - half, rect.y + rect.d / 2),
-          b: roomAt(grid, rooms, rect.x + rect.w + half, rect.y + rect.d / 2),
+          a: roomAt(grid, rooms, rect.x - half, along),
+          b: roomAt(grid, rooms, rect.x + rect.w + half, along),
         };
-    const roomsBySide: Wall["rooms"] = {};
-    if (sides.a) roomsBySide.a = sides.a;
-    if (sides.b) roomsBySide.b = sides.b;
-    return {
-      id: wallId(kind, rect),
-      rect,
-      kind,
-      height: kind === "low" ? opts.lowHeight : opts.height,
-      rooms: roomsBySide,
-    };
-  });
+  };
+  const parts: { rect: Rect; a?: Id; b?: Id }[] = [];
+  let start = 0;
+  let current = sideAt(0);
+  for (let i = 1; i <= steps; i++) {
+    const next = i < steps ? sideAt(i) : null;
+    if (next && next.a === current.a && next.b === current.b) continue;
+    const from = start * cell,
+      to = i === steps ? length : i * cell;
+    const r = horizontal
+      ? { x: rect.x + from, y: rect.y, w: to - from, d: rect.d }
+      : { x: rect.x, y: rect.y + from, w: rect.w, d: to - from };
+    parts.push({
+      rect: r,
+      ...(current.a ? { a: current.a } : {}),
+      ...(current.b ? { b: current.b } : {}),
+    });
+    start = i;
+    if (next) current = next;
+  }
+  return parts;
 }

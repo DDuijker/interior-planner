@@ -1,10 +1,30 @@
 "use client";
 
-import Link from "next/link";
 import { UNITS, type Unit } from "@/core/model/types";
 import { useI18n } from "@/i18n/I18nProvider";
+import type { MessageKey } from "@/i18n/translate";
 import { IconButton } from "@/ui/components/Button";
+import type { IconName } from "@/ui/icons";
 import type { Tool } from "./state";
+
+const NAV_TOOLS: [Tool, IconName][] = [
+  ["select", "select"],
+  ["pan", "hand"],
+  ["measure", "ruler"],
+];
+
+const DRAW_TOOLS: [Tool, IconName][] = [
+  ["room-rect", "room"],
+  ["room-l", "floors"],
+  ["room-poly", "polygon"],
+  ["wall", "wall"],
+];
+
+const OPENING_TOOLS: [Tool, IconName][] = [
+  ["door", "door"],
+  ["window", "window"],
+  ["passage", "hammer"],
+];
 
 export function Toolbar({
   tool,
@@ -26,6 +46,9 @@ export function Toolbar({
   onHelp,
   panelOpen,
   onTogglePanel,
+  ghost,
+  hasBelow,
+  onToggleGhost,
 }: {
   tool: Tool;
   onTool: (t: Tool) => void;
@@ -46,33 +69,29 @@ export function Toolbar({
   onHelp: () => void;
   panelOpen: boolean;
   onTogglePanel: () => void;
+  ghost: boolean;
+  hasBelow: boolean;
+  onToggleGhost: () => void;
 }) {
   const { t } = useI18n();
+  const toolButton = ([id, icon]: [Tool, IconName]) => (
+    <IconButton
+      key={id}
+      icon={icon}
+      label={t(`editor.tool.${id}` as MessageKey)}
+      pressed={tool === id}
+      onClick={() => onTool(tool === id ? "select" : id)}
+    />
+  );
   return (
-    <header className="editor-bar">
-      <Link href="/" className="editor-brand display">
-        {t("app.name")}
-      </Link>
+    <div className="editor-bar">
       <div role="toolbar" aria-label={t("editor.toolbar")} className="editor-tools">
-        <div className="tool-group">
-          <IconButton
-            icon="select"
-            label={t("editor.tool.select")}
-            pressed={tool === "select"}
-            onClick={() => onTool("select")}
-          />
-          <IconButton
-            icon="hand"
-            label={t("editor.tool.pan")}
-            pressed={tool === "pan"}
-            onClick={() => onTool("pan")}
-          />
-          <IconButton
-            icon="ruler"
-            label={t("editor.tool.measure")}
-            pressed={tool === "measure"}
-            onClick={() => onTool("measure")}
-          />
+        <div className="tool-group">{NAV_TOOLS.map(toolButton)}</div>
+        <div className="tool-group" aria-label={t("editor.draw")}>
+          {DRAW_TOOLS.map(toolButton)}
+        </div>
+        <div className="tool-group" aria-label={t("editor.openings")}>
+          {OPENING_TOOLS.map(toolButton)}
         </div>
         <div className="tool-group">
           <IconButton icon="undo" label={t("editor.undo")} disabled={!canUndo} onClick={onUndo} />
@@ -92,6 +111,12 @@ export function Toolbar({
             <input type="checkbox" checked={snap} onChange={onToggleSnap} />
             {t("editor.snap")}
           </label>
+          {hasBelow && (
+            <label className="check">
+              <input type="checkbox" checked={ghost} onChange={onToggleGhost} />
+              {t("editor.ghost")}
+            </label>
+          )}
           <label className="inline-select">
             <span className="sr-only">{t("editor.gridSize")}</span>
             <select
@@ -130,6 +155,6 @@ export function Toolbar({
           />
         </div>
       </div>
-    </header>
+    </div>
   );
 }

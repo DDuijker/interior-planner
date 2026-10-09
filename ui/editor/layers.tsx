@@ -7,7 +7,18 @@ import { roomArea } from "@/core/editor/rooms";
 import { formatArea, formatLength } from "@/core/measure/units";
 import type { DimensionLine } from "@/core/measure/dimensions";
 import { doorSwing, type WallPiece } from "@/core/openings/openings";
-import type { Fixture, Id, Item, Opening, Room, Unit, Wall } from "@/core/model/types";
+import type {
+  CustomItemDef,
+  Fixture,
+  Id,
+  Item,
+  Opening,
+  Room,
+  Unit,
+  Wall,
+} from "@/core/model/types";
+import { itemParts, resolveEntry } from "@/catalog";
+import { TopView } from "@/ui/catalog/PartsSvg";
 import { ROOM_TINTS } from "./roomColors";
 
 /** Screen pixels to world units at the current zoom. */
@@ -193,12 +204,14 @@ export const ItemShape = memo(function ItemShape({
   conflict,
   px,
   showName,
+  custom,
 }: {
   item: Item;
   selected: boolean;
   conflict: boolean;
   px: Px;
   showName: boolean;
+  custom: readonly CustomItemDef[];
 }) {
   const cls = [
     "plan-item",
@@ -208,38 +221,29 @@ export const ItemShape = memo(function ItemShape({
   ]
     .filter(Boolean)
     .join(" ");
-  const fill = item.color ?? "var(--c-panel)";
   const hw = item.w / 2,
     hd = item.d / 2;
+  const entry = resolveEntry(item, custom);
+  const parts = itemParts(item, custom);
   return (
     <g
       className={cls}
       data-item={item.id}
       transform={`translate(${item.x} ${item.y}) rotate(${item.rotation})`}
     >
-      {item.shape === "round" ? (
-        <ellipse rx={hw} ry={hd} fill={fill} />
-      ) : (
-        <>
-          <rect
-            x={-hw}
-            y={-hd}
-            width={item.w}
-            height={item.d}
-            rx={Math.min(4, hw, hd)}
-            fill={fill}
-          />
-          {/* Back edge, so you can see which way it faces. */}
-          {item.mount !== "wall" && (
-            <path d={`M${-hw} ${-hd}h${item.w}`} className="plan-item-back" />
-          )}
-        </>
-      )}
+      {/* Invisible hit area so thin parts are still easy to grab. */}
+      <rect x={-hw} y={-hd} width={item.w} height={item.d} className="plan-item-hit" />
+      <g className="plan-item-parts">
+        <TopView parts={parts} item={item} entry={entry} strokeWidth={px(0.8)} />
+      </g>
       {conflict && (
-        <path
-          d={`M${-hw} ${-hd}L${hw} ${hd}M${hw} ${-hd}L${-hw} ${hd}`}
-          className="plan-item-conflict-mark"
-        />
+        <>
+          <rect x={-hw} y={-hd} width={item.w} height={item.d} className="plan-item-conflict-box" />
+          <path
+            d={`M${-hw} ${-hd}L${hw} ${hd}M${hw} ${-hd}L${-hw} ${hd}`}
+            className="plan-item-conflict-mark"
+          />
+        </>
       )}
       {showName && Math.min(item.w, item.d) > px(28) && (
         <text
