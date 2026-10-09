@@ -71,3 +71,12 @@ Every push to `main` builds and deploys to GitHub Pages
 (`.github/workflows/deploy.yml`). The workflow sets `NEXT_PUBLIC_BASE_PATH` to
 `/<repo>` so assets and routes work under the Pages sub-path. Pull requests
 get the static build as a downloadable artifact.
+
+### One-time repository settings
+
+These are not in code and need a repo admin:
+
+1. **Settings > Pages > Source: GitHub Actions** (enables the deploy job).
+2. **Settings > Branches > Add rule for `main`**: require a pull request and
+   the status checks `Lint, typecheck and unit tests`, `End-to-end (Chromium)`
+   and `Static build`, so a red PR cannot be merged.
