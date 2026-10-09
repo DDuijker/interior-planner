@@ -558,6 +558,8 @@ export function Workspace({
               onTab={setTab}
               wallPick={state.wall}
               roomPick={state.room}
+              openingPick={state.opening}
+              fixturePick={state.fixture}
               walls={walls}
               catalog={
                 <CatalogPanel

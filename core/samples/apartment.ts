@@ -1,3 +1,4 @@
+import { getEntry } from "@/catalog";
 import { createFixture } from "../fixtures/fixtures";
 import { createProject } from "../model/defaults";
 import type { Item, Project, Room, RoomType } from "../model/types";
@@ -36,6 +37,7 @@ const CATALOG: Record<string, string> = {
   plant: "plant-monstera",
   vase: "vase-small",
   painting: "painting-medium",
+  pendant: "lamp-pendant",
   bed: "bed-160",
   "nightstand-l": "nightstand",
   "nightstand-r": "nightstand",
@@ -43,7 +45,9 @@ const CATALOG: Record<string, string> = {
 };
 
 function item(id: string, spec: ItemSpec): Item {
+  const light = getEntry(CATALOG[id] ?? id)?.light;
   return {
+    ...(light ? { light: { on: true, color: light.color, intensity: light.intensity } } : {}),
     id,
     catalogId: CATALOG[id] ?? id,
     rotation: 0,
@@ -172,6 +176,18 @@ export function sampleApartment(): Project {
       h: 160,
       shape: "round",
       layer: "lighting",
+    }),
+    item("pendant", {
+      name: "Hanglamp",
+      x: 320,
+      y: 320,
+      w: 45,
+      d: 45,
+      h: 80,
+      shape: "round",
+      layer: "lighting",
+      mount: "wall",
+      elevation: 0,
     }),
     item("plant", {
       name: "Plant",

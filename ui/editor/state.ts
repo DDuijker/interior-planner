@@ -47,6 +47,8 @@ export interface EditorState {
   room: Id | null;
   /** Selected door, window or passage. */
   opening: Id | null;
+  /** Selected fixed element. */
+  fixture: Id | null;
   /** Show the floor below as a ghost in 2D. */
   ghost: boolean;
 }
@@ -66,6 +68,7 @@ export type EditorAction =
   | { type: "pickWall"; wall: WallPick | null }
   | { type: "pickRoom"; room: Id | null }
   | { type: "pickOpening"; opening: Id | null }
+  | { type: "pickFixture"; fixture: Id | null }
   | { type: "load"; project: Project };
 
 export function initialEditorState(project: Project): EditorState {
@@ -81,6 +84,7 @@ export function initialEditorState(project: Project): EditorState {
     wall: null,
     room: null,
     opening: null,
+    fixture: null,
     ghost: true,
   };
 }
@@ -92,6 +96,9 @@ function pruneSelection(project: Project, ids: Id[]): Id[] {
   const kept = ids.filter((id) => known.has(id));
   return kept.length === ids.length ? ids : kept;
 }
+
+/** Only one kind of thing is picked at a time. */
+const NO_PICK = { wall: null, room: null, opening: null, fixture: null } as const;
 
 export function editorReducer(state: EditorState, action: EditorAction): EditorState {
   switch (action.type) {
@@ -120,7 +127,7 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
       const ids = expandToGroups(items, action.ids);
       if (!action.additive) {
         if (!ids.length) return { ...state, selection: ids };
-        return { ...state, selection: ids, wall: null, room: null, opening: null };
+        return { ...state, ...NO_PICK, selection: ids };
       }
       // Shift-click toggles: remove if everything is already selected.
       const current = new Set(state.selection);
@@ -142,26 +149,30 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
     case "pickWall":
       return {
         ...state,
+        ...NO_PICK,
         wall: action.wall,
-        room: null,
-        opening: null,
         selection: action.wall ? [] : state.selection,
       };
     case "pickRoom":
       return {
         ...state,
+        ...NO_PICK,
         room: action.room,
-        wall: null,
-        opening: null,
         selection: action.room ? [] : state.selection,
       };
     case "pickOpening":
       return {
         ...state,
+        ...NO_PICK,
         opening: action.opening,
-        wall: null,
-        room: null,
         selection: action.opening ? [] : state.selection,
+      };
+    case "pickFixture":
+      return {
+        ...state,
+        ...NO_PICK,
+        fixture: action.fixture,
+        selection: action.fixture ? [] : state.selection,
       };
     case "load":
       return { ...state, history: reset(state.history, action.project), selection: [] };

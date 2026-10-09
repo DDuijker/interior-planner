@@ -6,8 +6,14 @@ import type { LayoutIssue } from "@/core/collision/collision";
 import { roomArea } from "@/core/editor/rooms";
 import { formatArea, formatLength } from "@/core/measure/units";
 import {
+  addFixture,
   addOpening,
   duplicateItems,
+  getFloor,
+  removeFixture,
+  removeOpening,
+  updateFixture,
+  updateOpening,
   groupItems,
   removeItems,
   removeRoom,
@@ -21,16 +27,26 @@ import {
 } from "@/core/model/actions";
 import { newId } from "@/core/model/ids";
 import {
+  CARDINALS,
+  FIXTURE_TYPES,
   LAYERS,
   ROOM_TYPES,
+  STAIR_SHAPES,
+  type Cardinal,
+  type Fixture,
+  type FixtureType,
   type Id,
   type Item,
+  type Opening,
   type Project,
   type RoomType,
+  type StairShape,
   type Version,
   type Wall,
 } from "@/core/model/types";
-import { placeOnWall } from "@/core/openings/openings";
+import { clampFixtureSize, createFixture } from "@/core/fixtures/fixtures";
+import { checkStairs } from "@/core/scene/scene";
+import { placeOnWall, setGlass, validateOpening } from "@/core/openings/openings";
 import { resolveWallFinish } from "@/core/style/style";
 import { useI18n } from "@/i18n/I18nProvider";
 import type { MessageKey } from "@/i18n/translate";
@@ -60,6 +76,8 @@ export function SidePanel({
   onTab,
   wallPick,
   roomPick,
+  openingPick,
+  fixturePick,
   walls,
   catalog,
 }: {
@@ -74,6 +92,8 @@ export function SidePanel({
   onTab: (t: SidebarTab) => void;
   wallPick: WallPick | null;
   roomPick: Id | null;
+  openingPick: Id | null;
+  fixturePick: Id | null;
   walls: readonly Wall[];
   catalog: React.ReactNode;
 }) {
@@ -115,6 +135,8 @@ export function SidePanel({
             dispatch={dispatch}
             wallPick={wallPick}
             roomPick={roomPick}
+            openingPick={openingPick}
+            fixturePick={fixturePick}
             walls={walls}
           />
         )}
@@ -141,6 +163,8 @@ function PropsTab({
   dispatch,
   wallPick,
   roomPick,
+  openingPick,
+  fixturePick,
   walls,
 }: {
   project: Project;
@@ -149,6 +173,8 @@ function PropsTab({
   dispatch: (a: EditorAction) => void;
   wallPick: WallPick | null;
   roomPick: Id | null;
+  openingPick: Id | null;
+  fixturePick: Id | null;
   walls: readonly Wall[];
 }) {
   const { t } = useI18n();
@@ -171,6 +197,11 @@ function PropsTab({
     );
   if (room)
     return <RoomPanel project={project} roomId={room.id} version={version} dispatch={dispatch} />;
+  const opening = openingPick ? version.openings.find((o) => o.id === openingPick) : undefined;
+  if (opening)
+    return <OpeningPanel project={project} opening={opening} dispatch={dispatch} walls={walls} />;
+  const fixture = fixturePick ? version.fixtures.find((f) => f.id === fixturePick) : undefined;
+  if (fixture) return <FixturePanel project={project} fixture={fixture} dispatch={dispatch} />;
 
   return (
     <section className="panel-section">
@@ -772,6 +803,8 @@ function OverviewTab({
         </ul>
       </details>
 
+      <FixturesSection version={version} dispatch={dispatch} />
+
       <BackgroundSection project={project} version={version} dispatch={dispatch} />
     </>
   );
@@ -907,4 +940,339 @@ function issueText(
     case "clearance":
       return t("warning.clearance", { a: name(a), b: name(b), gap: len(issue.gap ?? 0) });
   }
+}
+
+/** Door, window or passage (E02-07). */
+function OpeningPanel({
+  project,
+  opening,
+  dispatch,
+  walls,
+}: {
+  project: Project;
+  opening: Opening;
+  dispatch: (a: EditorAction) => void;
+  walls: readonly Wall[];
+}) {
+  const { t } = useI18n();
+  const unit = project.settings.unit;
+  const wall = walls.find((w) => w.id === opening.wallId);
+  const wallHeight = wall?.height ?? 260;
+  const set = (patch: Partial<Opening>) =>
+    dispatch({ type: "apply", update: (p) => updateOpening(p, opening.id, patch) });
+  const problems = validateOpening(opening, wallHeight);
+  const err = (field: string) => problems.find((x) => x.field === field) && t("opening.invalid");
+  return (
+    <section
+      className="panel-section stack"
+      aria-label={t(`opening.${opening.kind}` as MessageKey)}
+    >
+      <h2 className="panel-title">{t(`opening.${opening.kind}` as MessageKey)}</h2>
+      <LengthField
+        label={t("editor.width")}
+        value={opening.w}
+        unit={unit}
+        min={30}
+        onCommit={(w) => {
+          const placed = wall ? placeOnWall({ ...opening, w }, wall) : { ...opening, w };
+          set({ w: placed.w, x: placed.x, y: placed.y });
+        }}
+      />
+      {opening.kind !== "window" && (
+        <LengthField
+          label={t("editor.height")}
+          value={opening.height}
+          unit={unit}
+          min={100}
+          onCommit={(height) => set({ height: Math.min(height, wallHeight) })}
+        />
+      )}
+      {opening.kind === "door" && (
+        <>
+          <div className="chips" role="radiogroup" aria-label={t("opening.hinge")}>
+            {(["start", "end"] as const).map((h) => (
+              <button
+                key={h}
+                type="button"
+                role="radio"
+                aria-checked={opening.hinge === h}
+                className="chip"
+                onClick={() => set({ hinge: h })}
+              >
+                {t(`opening.hinge.${h}` as MessageKey)}
+              </button>
+            ))}
+          </div>
+          <div className="chips" role="radiogroup" aria-label={t("opening.swing")}>
+            {(["a", "b"] as const).map((sw) => (
+              <button
+                key={sw}
+                type="button"
+                role="radio"
+                aria-checked={opening.swing === sw}
+                className="chip"
+                onClick={() => set({ swing: sw })}
+              >
+                {t(
+                  opening.dir === "h"
+                    ? sw === "a"
+                      ? "side.north"
+                      : "side.south"
+                    : sw === "a"
+                      ? "side.west"
+                      : "side.east",
+                )}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+      {opening.kind === "window" && (
+        <>
+          <label className="check">
+            <input
+              type="checkbox"
+              checked={opening.glass}
+              onChange={(e) => set(setGlass(opening, e.target.checked, wallHeight))}
+            />
+            {t("opening.glass")}
+          </label>
+          {!opening.glass && (
+            <>
+              <LengthField
+                label={t("opening.sill")}
+                value={opening.sill}
+                unit={unit}
+                min={0}
+                onCommit={(sill) => set({ sill })}
+              />
+              {err("sill") && <p className="field-error">{err("sill")}</p>}
+              <LengthField
+                label={t("opening.lintel")}
+                value={opening.lintel}
+                unit={unit}
+                min={20}
+                onCommit={(lintel) => set({ lintel })}
+              />
+              {err("lintel") && <p className="field-error">{err("lintel")}</p>}
+            </>
+          )}
+        </>
+      )}
+      <Button
+        variant="danger"
+        icon="trash"
+        onClick={() => {
+          dispatch({ type: "apply", update: (p) => removeOpening(p, opening.id) });
+          dispatch({ type: "pickOpening", opening: null });
+        }}
+      >
+        {t("editor.delete")}
+      </Button>
+    </section>
+  );
+}
+
+/** Fixed element; stairs get shape, direction and a steepness check (E02-08, E05-24). */
+function FixturePanel({
+  project,
+  fixture,
+  dispatch,
+}: {
+  project: Project;
+  fixture: Fixture;
+  dispatch: (a: EditorAction) => void;
+}) {
+  const { t } = useI18n();
+  const unit = project.settings.unit;
+  const floorHeight = getFloor(project).height;
+  const set = (patch: Partial<Fixture>) =>
+    dispatch({ type: "apply", update: (p) => updateFixture(p, fixture.id, patch) });
+  const resize = (patch: { w?: number; d?: number }) => {
+    const size = clampFixtureSize(fixture.type, patch.w ?? fixture.w, patch.d ?? fixture.d);
+    set(size);
+  };
+  const check = fixture.type === "stairs" ? checkStairs(fixture, floorHeight) : null;
+  return (
+    <section
+      className="panel-section stack"
+      aria-label={t(`fixture.${fixture.type}` as MessageKey)}
+    >
+      <h2 className="panel-title">{t(`fixture.${fixture.type}` as MessageKey)}</h2>
+      <label className="check">
+        <input
+          type="checkbox"
+          checked={fixture.locked}
+          onChange={(e) =>
+            dispatch({
+              type: "apply",
+              update: (p) => updateFixture(p, fixture.id, { locked: e.target.checked }),
+            })
+          }
+        />
+        {t("fixture.locked")}
+      </label>
+      {fixture.locked && <p className="muted small">{t("fixture.lockedHint")}</p>}
+      <div className="props-row">
+        <LengthField
+          label={t("editor.width")}
+          value={fixture.w}
+          unit={unit}
+          onCommit={(w) => resize({ w })}
+        />
+        <LengthField
+          label={t("editor.depth")}
+          value={fixture.d}
+          unit={unit}
+          onCommit={(d) => resize({ d })}
+        />
+      </div>
+      <div className="row">
+        <IconButton
+          icon="rotateLeft"
+          label={t("editor.rotateLeft90")}
+          disabled={fixture.locked}
+          onClick={() => set({ rotation: (fixture.rotation + 270) % 360 })}
+        />
+        <IconButton
+          icon="rotateRight"
+          label={t("editor.rotateRight90")}
+          disabled={fixture.locked}
+          onClick={() => set({ rotation: (fixture.rotation + 90) % 360 })}
+        />
+      </div>
+      {fixture.type === "stairs" && check && (
+        <>
+          <label className="field">
+            <span className="field-label">{t("stairs.shape")}</span>
+            <select
+              className="input"
+              value={fixture.stair?.shape ?? "straight"}
+              disabled={fixture.locked}
+              onChange={(e) =>
+                set({
+                  stair: { up: fixture.stair?.up ?? "N", shape: e.target.value as StairShape },
+                })
+              }
+            >
+              {STAIR_SHAPES.map((sh) => (
+                <option key={sh} value={sh}>
+                  {t(`stairs.${sh}` as MessageKey)}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="field">
+            <span className="field-label">{t("stairs.up")}</span>
+            <select
+              className="input"
+              value={fixture.stair?.up ?? "N"}
+              disabled={fixture.locked}
+              onChange={(e) =>
+                set({
+                  stair: {
+                    shape: fixture.stair?.shape ?? "straight",
+                    up: e.target.value as Cardinal,
+                  },
+                })
+              }
+            >
+              {CARDINALS.map((c) => (
+                <option key={c} value={c}>
+                  {t(`cardinal.${c}` as MessageKey)}
+                </option>
+              ))}
+            </select>
+          </label>
+          <p className="muted small">
+            {t("stairs.summary", {
+              risers: check.risers,
+              riser: formatLength(check.riserHeight, unit),
+              angle: Math.round(check.angle),
+            })}
+          </p>
+          {check.tooSteep && (
+            <p className="notice notice-warn" role="alert">
+              <strong>{t("warningTag.stairs")}</strong>{" "}
+              {t("stairs.steep", { angle: Math.round(check.angle) })}
+            </p>
+          )}
+        </>
+      )}
+      <Button
+        variant="danger"
+        icon="trash"
+        onClick={() => {
+          dispatch({ type: "apply", update: (p) => removeFixture(p, fixture.id) });
+          dispatch({ type: "pickFixture", fixture: null });
+        }}
+      >
+        {t("editor.delete")}
+      </Button>
+    </section>
+  );
+}
+
+/** List of fixed elements and a way to add one (E02-08). */
+function FixturesSection({
+  version,
+  dispatch,
+}: {
+  version: Version;
+  dispatch: (a: EditorAction) => void;
+}) {
+  const { t } = useI18n();
+  const [type, setType] = useState<FixtureType>("kitchen");
+  const centre = (() => {
+    const rect =
+      version.rooms[0]?.shape.kind === "rects" ? version.rooms[0].shape.rects[0] : undefined;
+    return rect ? { x: rect.x + 20, y: rect.y + 20 } : { x: 0, y: 0 };
+  })();
+  return (
+    <details className="panel-section">
+      <summary className="panel-title">{t("fixture.title")}</summary>
+      <ul className="object-list">
+        {version.fixtures.map((f) => (
+          <li key={f.id}>
+            <button
+              type="button"
+              className="object-button"
+              onClick={() => dispatch({ type: "pickFixture", fixture: f.id })}
+            >
+              {t(`fixture.${f.type}` as MessageKey)}
+            </button>
+          </li>
+        ))}
+      </ul>
+      <div className="row">
+        <label className="inline-select">
+          <span className="sr-only">{t("fixture.type")}</span>
+          <select
+            className="input"
+            value={type}
+            onChange={(e) => setType(e.target.value as FixtureType)}
+          >
+            {FIXTURE_TYPES.map((ft) => (
+              <option key={ft} value={ft}>
+                {t(`fixture.${ft}` as MessageKey)}
+              </option>
+            ))}
+          </select>
+        </label>
+        <Button
+          icon="plus"
+          onClick={() => {
+            const f = createFixture(type, centre.x, centre.y, {
+              locked: false,
+              ...(type === "stairs" ? { stair: { shape: "straight", up: "N" } } : {}),
+            });
+            dispatch({ type: "apply", update: (p) => addFixture(p, f) });
+            dispatch({ type: "pickFixture", fixture: f.id });
+          }}
+        >
+          {t("common.add")}
+        </Button>
+      </div>
+    </details>
+  );
 }

@@ -458,6 +458,7 @@ export function PlanCanvas({
       return;
     }
     const fixture = fixtureAt(world);
+    if (fixture) dispatch({ type: "pickFixture", fixture: fixture.id });
     if (fixture && !fixture.locked) {
       dispatch({ type: "begin" });
       gesture.current = {
@@ -468,6 +469,7 @@ export function PlanCanvas({
       };
       return;
     }
+    if (fixture) return;
     const wallHit = wallAt(world);
     if (wallHit) {
       dispatch({ type: "pickWall", wall: { wallId: wallHit.wall.id, side: wallHit.side } });
@@ -944,6 +946,22 @@ export function PlanCanvas({
               ))}
             </g>
           )}
+          {state.fixture &&
+            (() => {
+              const f = version.fixtures.find((x) => x.id === state.fixture);
+              if (!f) return null;
+              return (
+                <rect
+                  x={f.x - px(3)}
+                  y={f.y - px(3)}
+                  width={f.w + px(6)}
+                  height={f.d + px(6)}
+                  transform={`rotate(${f.rotation} ${f.x + f.w / 2} ${f.y + f.d / 2})`}
+                  className="plan-opening-pick"
+                  strokeWidth={px(2)}
+                />
+              );
+            })()}
           {pickedOpening &&
             (() => {
               const r = openingRect(pickedOpening, walls);
