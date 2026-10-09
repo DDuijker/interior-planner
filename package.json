@@ -14,7 +14,8 @@
     "test:coverage": "vitest run --coverage",
     "e2e": "playwright test",
     "prepare": "husky",
-    "preview": "npx serve out"
+    "preview": "npx serve out",
+    "prebuild": "vitest run catalog --reporter=dot"
   },
   "dependencies": {
     "immer": "^11.1.21",
