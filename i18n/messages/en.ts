@@ -537,4 +537,147 @@ export const en: Record<MessageKey, string> = {
   "cardinal.E": "East (right)",
   "cardinal.S": "South (down)",
   "cardinal.W": "West (left)",
+  "ai.intro":
+    "Let Claude read a floor plan: a photo, scan or PDF from an estate agent's brochure. Then you check the result and fix what is off.",
+  "ai.badFile": "Choose an image or a PDF.",
+  "ai.pdfTooBig": "This PDF is larger than 20 MB. Export only the page with the floor plan.",
+  "ai.invalid":
+    "Claude did not return valid plan-code ({errors}). Try again, or with a sharper photo.",
+  "ai.error.key": "The API key does not work. Check it in Settings.",
+  "ai.error.rate":
+    "Too many requests or your credit has run out. Wait a moment or check your Anthropic Console.",
+  "ai.error.overloaded": "Claude is overloaded right now. Try again in a moment.",
+  "ai.error.refused": "Claude declined to process this image.",
+  "ai.error.network": "No connection to Anthropic. Are you online?",
+  "ai.error.other": "Something went wrong at Claude.",
+  "ai.previewAlt": "Chosen floor plan",
+  "ai.drop": "Drag a photo or PDF here, or paste one.",
+  "ai.choose": "Choose file",
+  "ai.floors": "Floors in the image",
+  "ai.floors.auto": "Let Claude decide",
+  "ai.hint": "Known measurement (optional)",
+  "ai.hintPlaceholder": "e.g. living room is 5.40 m wide",
+  "ai.privacy":
+    "The file goes straight from your browser to Anthropic (Claude), with your own API key. It goes nowhere else.",
+  "ai.cost":
+    "Reading a plan usually costs around ${cost} with {model}, paid from your own Anthropic credit.",
+  "ai.consent": "I agree to send this file to Claude",
+  "ai.reading": "Claude is reading the plan…",
+  "ai.repairing": "Claude is fixing the plan-code…",
+  "ai.received": "({count} characters received)",
+  "ai.failed": "Did not work.",
+  "ai.start": "Read with Claude",
+  "ai.noKey":
+    "To read photos the app uses Claude by Anthropic, with your own API key. You have not entered a key yet.",
+  "ai.noKeyAlt": "Everything else works without a key: paste plan-code or draw the rooms yourself.",
+  "ai.toSettings": "Enter key",
+  "ai.reviewTitle": "Check the result",
+  "ai.spent": "Cost of this reading: about ${cost}.",
+  "ai.scaleTitle": "Is the scale right?",
+  "ai.scaleHint": "Measure one room. Enter its real width and the whole plan scales along.",
+  "ai.scaleRoom": "Room",
+  "ai.scaleReal": "Real width",
+  "ai.scaleApply": "Adjust scale",
+  "ai.scaleBad": "I cannot use that measurement.",
+  "ai.scaled": "Plan scaled by {percent}%",
+  "ai.afterImport":
+    "After importing, the photo lies under the plan so you can compare. Adjust walls and rooms in the 2D editor; the photo's opacity and scale under Background.",
+  "ai.again": "Start over",
+  "ai.imported": "{count} floor(s) imported",
+  "settings.general": "General",
+  "settings.quality": "3D quality",
+  "settings.quality.auto": "Automatic",
+  "settings.quality.low": "Low (slow phones)",
+  "settings.quality.medium": "Medium",
+  "settings.quality.high": "High",
+  "settings.unitHint":
+    "The unit applies to new projects. Internally the app always works in centimetres.",
+  "unit.cm": "centimetres",
+  "unit.mm": "millimetres",
+  "unit.in": "inches",
+  "unit.ft": "feet",
+  "settings.saving": "Saving",
+  "settings.autosave": "Save automatically in this browser",
+  "settings.backupEvery": "Remind me to back up after",
+  "settings.never": "Never",
+  "settings.changes": "{count} changes",
+  "settings.localOnly":
+    "Everything lives in this browser only. Download a project file now and then as a backup.",
+  "settings.errors": "Error reports",
+  "settings.errorReports": "Offer to prepare an error report when something breaks",
+  "settings.errorReportsHint":
+    "A report is never sent by itself. You can read it, copy it and share it yourself.",
+  "settings.resetTitle": "Reset",
+  "settings.reset": "Reset settings",
+  "settings.resetDone": "Settings reset",
+  "settings.resetHint": "Your projects and your API key are kept.",
+  "settings.tourAgain": "Show the tour again",
+  "settings.claude": "Claude (AI)",
+  "settings.claudeIntro":
+    "Reading floor plans, turning interior photos into a plan and taking a style from your moodboard is done with Claude by Anthropic. You need your own API key for that. Everything else works without one.",
+  "settings.apiKey": "Claude API key",
+  "settings.showKey": "Show",
+  "settings.hideKey": "Hide",
+  "settings.testKey": "Test key",
+  "settings.testing": "Testing…",
+  "settings.keyOk": "The key works",
+  "settings.keySaved": "Key saved in this browser",
+  "settings.keyRemoved": "Key removed",
+  "settings.removeKey": "Remove key",
+  "settings.model": "Model",
+  "settings.model.claude-opus-5-5": "Claude Opus 5.5, best result",
+  "settings.model.claude-sonnet-5-5": "Claude Sonnet 5.5, faster and cheaper",
+  "settings.model.claude-haiku-5-5": "Claude Haiku 5.5, cheapest",
+  "settings.costHint":
+    "Prices in dollars per million tokens (in/out). Reading a floor plan with this model usually costs around ${cost}.",
+  "settings.howKey": "How do I get a key?",
+  "settings.howKey1": "Create an account at",
+  "settings.howKey2":
+    "Add some credit to your account (Billing). A few dollars is enough for many floor plans.",
+  "settings.howKey3": "Create a key under API Keys and paste it above.",
+  "settings.privacy1":
+    "Your key stays in this browser. It is not in project files or the URL and is never logged.",
+  "settings.privacy2":
+    "A photo or floor plan only goes to Anthropic when you agree each time, straight from your browser.",
+  "settings.privacy3": "On a shared computer? Remove the key when you are done.",
+  "help.contents": "Contents",
+  "help.start.title": "Getting started",
+  "help.start.body":
+    "Create a project and load a floor plan: paste plan-code, read a photo with Claude, or draw the rooms yourself. A project has floors; every floor has a current situation and designs. A new design starts as a copy of the current situation.",
+  "help.draw.title": "Drawing",
+  "help.draw.body":
+    "Draw rooms as a rectangle, L-shape or polygon. Walls appear by themselves: an interior wall between two rooms, an exterior wall at the edge. Drag walls and corners to change sizes. Doors, windows and passages snap to the nearest wall.",
+  "help.furnish.title": "Furnishing",
+  "help.furnish.body":
+    "Drag furniture from the catalogue onto the plan. Small things like lamps and vases sit on the furniture below by themselves, paintings and mirrors hang on the nearest wall. Red marks with text point out collisions or too little walking space.",
+  "help.threeD.title": "3D and style",
+  "help.threeD.body":
+    "View the design in 3D from above, as a bird or walking. In Style, pick a preset or set paint, wallpaper, panelling and floors per room and per wall. Save combinations as a look to compare.",
+  "help.photos.title": "Photos",
+  "help.photos.body":
+    "Collect inspiration (for example from Pinterest, by dragging or pasting) and photos of your current interior. Take a colour palette from a photo, link a photo to a room or wall, and with your consent let Claude work with it.",
+  "help.save.title": "Saving and sharing",
+  "help.save.body":
+    "Everything lives only in your browser. Export a project file to make a backup or share it, and a PDF or PNG of the floor plan to scale.",
+  "help.planCode.title": "Plan-code",
+  "help.planCode.intro":
+    "Plan-code is a small JSON format for floor plans. One plan per floor, or a list of plans. All sizes in centimetres; x grows to the right, y grows down.",
+  "help.planCode.name": "Name of the floor (required).",
+  "help.planCode.level": "0 = ground floor, 1 = first floor, -1 = basement.",
+  "help.planCode.height": "Floor-to-ceiling height, default 260.",
+  "help.planCode.rooms":
+    "Rooms with name, type and rects ([x, y, width, depth]) or points (polygon).",
+  "help.planCode.walls": "Extra free-standing walls as [x, y, width, depth].",
+  "help.planCode.doors":
+    "x, y is the start on the wall, w the width, dir h (along x) or v (along y). Optional height, hinge and swing.",
+  "help.planCode.windows": "Like doors, plus glass (glass wall), sill and lintel.",
+  "help.planCode.passages": "Openings without a door.",
+  "help.planCode.fixtures":
+    "Fixed elements: type, top-left x, y, width w, depth h. Stairs take shape and up.",
+  "help.planCode.items":
+    "Furniture: catalogue id or name, centre x, y and back (N, E, S, W) or rotation.",
+  "help.planCode.roomTypes": "Room types:",
+  "help.planCode.fixtureTypes": "Fixture types:",
+  "help.planCode.autoWalls":
+    "You never draw walls between rooms: they come from the rooms. Rooms that touch get an interior wall, the edge an exterior wall.",
 };

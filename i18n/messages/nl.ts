@@ -542,6 +542,151 @@ export const nl = {
   "cardinal.E": "Oost (rechts)",
   "cardinal.S": "Zuid (onder)",
   "cardinal.W": "West (links)",
+  "ai.intro":
+    "Laat Claude een plattegrond lezen: een foto, scan of PDF van een makelaarsbrochure. Daarna controleer je het resultaat en pas je aan wat niet klopt.",
+  "ai.badFile": "Kies een afbeelding of een PDF.",
+  "ai.pdfTooBig": "Deze PDF is groter dan 20 MB. Exporteer alleen de pagina met de plattegrond.",
+  "ai.invalid":
+    "Claude gaf geen geldige plan-code terug ({errors}). Probeer het opnieuw, of met een scherpere foto.",
+  "ai.error.key": "De API-sleutel werkt niet. Controleer hem bij Instellingen.",
+  "ai.error.rate":
+    "Te veel verzoeken of je tegoed is op. Wacht even of kijk in je Anthropic Console.",
+  "ai.error.overloaded": "Claude is even overbelast. Probeer het zo nog eens.",
+  "ai.error.refused": "Claude wilde deze afbeelding niet verwerken.",
+  "ai.error.network": "Geen verbinding met Anthropic. Ben je online?",
+  "ai.error.other": "Er ging iets mis bij Claude.",
+  "ai.previewAlt": "Gekozen plattegrond",
+  "ai.drop": "Sleep een foto of PDF hierheen, of plak er een.",
+  "ai.choose": "Bestand kiezen",
+  "ai.floors": "Verdiepingen op de afbeelding",
+  "ai.floors.auto": "Laat Claude kijken",
+  "ai.hint": "Bekende maat (optioneel)",
+  "ai.hintPlaceholder": "bv. woonkamer is 5,40 m breed",
+  "ai.privacy":
+    "Het bestand gaat rechtstreeks vanuit je browser naar Anthropic (Claude), met jouw eigen API-sleutel. Het gaat nergens anders heen.",
+  "ai.cost":
+    "Een plattegrond lezen kost meestal rond ${cost} met {model}, betaald van je eigen Anthropic-tegoed.",
+  "ai.consent": "Ik geef toestemming om dit bestand naar Claude te sturen",
+  "ai.reading": "Claude leest de plattegrond…",
+  "ai.repairing": "Claude verbetert de plan-code…",
+  "ai.received": "({count} tekens ontvangen)",
+  "ai.failed": "Lukt niet.",
+  "ai.start": "Lees met Claude",
+  "ai.noKey":
+    "Voor het lezen van foto's gebruikt de app Claude van Anthropic, met je eigen API-sleutel. Je hebt nog geen sleutel ingevuld.",
+  "ai.noKeyAlt":
+    "Zonder sleutel werkt alles verder gewoon: plak plan-code of teken de kamers zelf.",
+  "ai.toSettings": "Sleutel invullen",
+  "ai.reviewTitle": "Controleer het resultaat",
+  "ai.spent": "Kosten van deze lezing: ongeveer ${cost}.",
+  "ai.scaleTitle": "Klopt de schaal?",
+  "ai.scaleHint":
+    "Meet één kamer na. Vul de echte breedte in, dan schaalt de hele plattegrond mee.",
+  "ai.scaleRoom": "Kamer",
+  "ai.scaleReal": "Echte breedte",
+  "ai.scaleApply": "Schaal aanpassen",
+  "ai.scaleBad": "Die maat kan ik niet gebruiken.",
+  "ai.scaled": "Plattegrond {percent}% geschaald",
+  "ai.afterImport":
+    "Na het importeren ligt de foto onder de plattegrond, zodat je kunt vergelijken. Muren en kamers pas je aan in de 2D-editor; transparantie en schaal van de foto bij Achtergrond.",
+  "ai.again": "Opnieuw",
+  "ai.imported": "{count} verdieping(en) geïmporteerd",
+  "settings.general": "Algemeen",
+  "settings.quality": "3D-kwaliteit",
+  "settings.quality.auto": "Automatisch",
+  "settings.quality.low": "Laag (trage telefoons)",
+  "settings.quality.medium": "Gemiddeld",
+  "settings.quality.high": "Hoog",
+  "settings.unitHint":
+    "De eenheid geldt voor nieuwe projecten. Intern rekent de app altijd in centimeters.",
+  "unit.cm": "centimeter",
+  "unit.mm": "millimeter",
+  "unit.in": "inch",
+  "unit.ft": "voet",
+  "settings.saving": "Opslaan",
+  "settings.autosave": "Automatisch opslaan in deze browser",
+  "settings.backupEvery": "Herinner me aan een back-up na",
+  "settings.never": "Nooit",
+  "settings.changes": "{count} wijzigingen",
+  "settings.localOnly":
+    "Alles staat alleen in deze browser. Download af en toe een projectbestand als back-up.",
+  "settings.errors": "Foutmeldingen",
+  "settings.errorReports": "Bied aan een foutrapport te maken als er iets misgaat",
+  "settings.errorReportsHint":
+    "Een rapport wordt nooit vanzelf verstuurd. Je kunt het lezen, kopiëren en zelf delen.",
+  "settings.resetTitle": "Terugzetten",
+  "settings.reset": "Instellingen terugzetten",
+  "settings.resetDone": "Instellingen teruggezet",
+  "settings.resetHint": "Je projecten en je API-sleutel blijven bewaard.",
+  "settings.tourAgain": "Rondleiding opnieuw tonen",
+  "settings.claude": "Claude (AI)",
+  "settings.claudeIntro":
+    "Plattegronden lezen, foto's van je interieur omzetten en een stijl uit je moodboard halen doet de app met Claude van Anthropic. Daarvoor heb je een eigen API-sleutel nodig. Zonder sleutel werkt al het andere gewoon.",
+  "settings.apiKey": "Claude API-sleutel",
+  "settings.showKey": "Toon",
+  "settings.hideKey": "Verberg",
+  "settings.testKey": "Test sleutel",
+  "settings.testing": "Testen…",
+  "settings.keyOk": "De sleutel werkt",
+  "settings.keySaved": "Sleutel bewaard in deze browser",
+  "settings.keyRemoved": "Sleutel verwijderd",
+  "settings.removeKey": "Sleutel verwijderen",
+  "settings.model": "Model",
+  "settings.model.claude-opus-5-5": "Claude Opus 5.5, beste resultaat",
+  "settings.model.claude-sonnet-5-5": "Claude Sonnet 5.5, sneller en goedkoper",
+  "settings.model.claude-haiku-5-5": "Claude Haiku 5.5, goedkoopst",
+  "settings.costHint":
+    "Prijzen in dollar per miljoen tokens (in/uit). Een plattegrond lezen kost met dit model meestal rond ${cost}.",
+  "settings.howKey": "Hoe kom ik aan een sleutel?",
+  "settings.howKey1": "Maak een account aan op",
+  "settings.howKey2":
+    "Zet wat tegoed op je account (Billing). Een paar dollar is genoeg voor veel plattegronden.",
+  "settings.howKey3": "Maak onder API Keys een sleutel aan en plak hem hierboven.",
+  "settings.privacy1":
+    "Je sleutel blijft in deze browser. Hij staat niet in projectbestanden, niet in de URL en wordt nergens gelogd.",
+  "settings.privacy2":
+    "Een foto of plattegrond gaat alleen naar Anthropic als jij daar per keer toestemming voor geeft, rechtstreeks vanuit je browser.",
+  "settings.privacy3": "Gebruik je een gedeelde computer? Verwijder de sleutel als je klaar bent.",
+  "help.contents": "Inhoud",
+  "help.start.title": "Beginnen",
+  "help.start.body":
+    "Maak een project en laad een plattegrond: plak plan-code, lees een foto met Claude, of teken de kamers zelf. Een project heeft verdiepingen; elke verdieping heeft een huidige situatie en ontwerpen. Een nieuw ontwerp begint als kopie van de huidige situatie.",
+  "help.draw.title": "Tekenen",
+  "help.draw.body":
+    "Teken kamers als rechthoek, L-vorm of veelhoek. Muren ontstaan vanzelf: tussen twee kamers een binnenmuur, aan de rand een buitenmuur. Sleep muren en hoekpunten om maten aan te passen. Deuren, ramen en doorgangen klikken vast op de dichtstbijzijnde muur.",
+  "help.furnish.title": "Inrichten",
+  "help.furnish.body":
+    "Sleep meubels uit de catalogus op de plattegrond. Kleine dingen zoals lampen en vazen gaan vanzelf bovenop het meubel eronder staan, schilderijen en spiegels hangen aan de dichtstbijzijnde muur. Rode markeringen met tekst wijzen op botsingen of te weinig loopruimte.",
+  "help.threeD.title": "3D en stijl",
+  "help.threeD.body":
+    "Bekijk het ontwerp in 3D van boven, als vogel of lopend. Kies in Stijl een van de presets of stel per kamer en per muur verf, behang, panelen en vloeren in. Bewaar combinaties als look om te vergelijken.",
+  "help.photos.title": "Foto's",
+  "help.photos.body":
+    "Verzamel inspiratie (bijvoorbeeld van Pinterest, via slepen of plakken) en foto's van je huidige interieur. Haal een kleurenpalet uit een foto, koppel een foto aan een kamer of muur, en laat Claude er met jouw toestemming iets mee doen.",
+  "help.save.title": "Opslaan en delen",
+  "help.save.body":
+    "Alles staat alleen in je browser. Exporteer een projectbestand om een back-up te maken of het met iemand te delen, en een PDF of PNG van de plattegrond op schaal.",
+  "help.planCode.title": "Plan-code",
+  "help.planCode.intro":
+    "Plan-code is een klein JSON-formaat voor plattegronden. Eén plan per verdieping, of een lijst van plannen. Alle maten in centimeters; x loopt naar rechts, y naar beneden.",
+  "help.planCode.name": "Naam van de verdieping (verplicht).",
+  "help.planCode.level": "0 = begane grond, 1 = eerste verdieping, -1 = kelder.",
+  "help.planCode.height": "Hoogte van vloer tot plafond, standaard 260.",
+  "help.planCode.rooms":
+    "Kamers met name, type en rects ([x, y, breedte, diepte]) of points (veelhoek).",
+  "help.planCode.walls": "Extra losse muren als [x, y, breedte, diepte].",
+  "help.planCode.doors":
+    "x, y is het begin op de muur, w de breedte, dir h (langs x) of v (langs y). Optioneel height, hinge en swing.",
+  "help.planCode.windows": "Als deuren, plus glass (glazen pui), sill (borstwering) en lintel.",
+  "help.planCode.passages": "Openingen zonder deur.",
+  "help.planCode.fixtures":
+    "Vaste elementen: type, linksboven x, y, breedte w, diepte h. Trappen met shape en up.",
+  "help.planCode.items":
+    "Meubels: id of naam uit de catalogus, midden x, y en back (N, E, S, W) of rotation.",
+  "help.planCode.roomTypes": "Kamertypes:",
+  "help.planCode.fixtureTypes": "Vaste elementen:",
+  "help.planCode.autoWalls":
+    "Muren tussen kamers teken je nooit zelf: die ontstaan uit de kamers. Kamers die elkaar raken krijgen een binnenmuur, de rand een buitenmuur.",
 } as const;
 
 export type MessageKey = keyof typeof nl;

@@ -18,6 +18,7 @@
     "prebuild": "vitest run catalog --reporter=dot"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.132.1",
     "immer": "^11.1.21",
     "next": "16.4.0",
     "react": "19.3.0",
