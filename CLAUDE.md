@@ -10,12 +10,13 @@ Praat met Djoeke in het Nederlands, casual en direct. Geen lange uitleg, geen em
 ## Vaste keuzes
 - **Stack:** Next.js (App Router) + TypeScript strict, static export, three.js voor 3D, SVG voor 2D.
 - **Hosting:** GitHub Pages via GitHub Actions. Geen backend.
-- **Opslag:** alleen lokaal (IndexedDB), plus export/import van een projectbestand. Geen accounts, geen cloud.
+- **Opslag:** alleen lokaal (IndexedDB), plus export/import van een projectbestand. Geen accounts, geen cloud. Dat geldt ook voor foto's (E13).
+- **Foto's:** inspiratie (bv. Pinterest) en foto's van het huidige interieur. Pinterest alleen via slepen/plakken of een opgeslagen link, de app haalt niets op bij Pinterest. Foto's gaan alleen naar de AI-dienst na toestemming per foto.
 - **AI-plattegrondlezer:** de gebruiker vult zijn eigen API-sleutel in. De sleutel blijft in de browser en komt nooit in de repo, in logs of in een URL. Zonder sleutel moet de app volledig werken via plan-code en zelf tekenen.
 - **Meubels:** generiek en zelf gemodelleerd. Geen IKEA of andere merkdata. Wel realistische standaardmaten.
 - **Talen:** Nederlands en Engels. Eenheden: cm, mm, inch, voet. Intern altijd centimeters.
 - **Tests:** unit tests voor alle pure logica in `/core`, Playwright voor de belangrijkste flows, CI op elke PR.
-- **Backlog:** de GitHub Issues (E01 t/m E12). Werk per issue, niet los van de lijst.
+- **Backlog:** de GitHub Issues (E01 t/m E13). Werk per issue, niet los van de lijst.
 
 ## Concepten die je moet kennen
 - **Project > Verdieping > Versie.** Een project heeft een of meer verdiepingen. Elke verdieping heeft een **Huidige situatie** (kaal: lege kamers, vloeren en wanden zoals ze zijn, alleen vaste dingen als keuken, sanitair, trap, deuren en ramen) en nul of meer **Ontwerpen**. Een nieuw ontwerp is een kopie van de huidige situatie. De huidige situatie blijft bewaard om mee te vergelijken.
