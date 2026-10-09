@@ -29,7 +29,7 @@ jobs:
       - run: npm run test:coverage
 
   e2e:
-    name: End-to-end (Chromium)
+    name: End-to-end (Chromium, mobile, WebKit)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -38,7 +38,7 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install --with-deps chromium webkit
       - run: npm run e2e
         env:
           NEXT_TELEMETRY_DISABLED: 1
@@ -50,4 +50,28 @@ jobs:
           path: |
             playwright-report
             test-results
+          retention-days: 7
+
+  budget:
+    name: Bundle budget and Lighthouse
+    runs-on: ubuntu-latest
+    env:
+      NEXT_TELEMETRY_DISABLED: 1
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm run budget
+      - name: Lighthouse
+        run: npx -y @lhci/cli@0.15.1 autorun
+      - name: Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse
+          path: lighthouse
           retention-days: 7

@@ -15,7 +15,9 @@
     "e2e": "playwright test",
     "prepare": "husky",
     "preview": "npx serve out",
-    "prebuild": "vitest run catalog --reporter=dot"
+    "prebuild": "vitest run catalog --reporter=dot",
+    "budget": "node scripts/bundle-budget.mjs",
+    "e2e:update": "playwright test --update-snapshots"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.132.1",

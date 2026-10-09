@@ -14,9 +14,17 @@ export default defineConfig({
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
   },
+  expect: {
+    // Visual regression (E12): small rendering differences are fine.
+    toHaveScreenshot: { maxDiffPixelRatio: 0.02, animations: "disabled" },
+  },
   projects: [
     { name: "chromium", use: { ...devices["Desktop Chrome"] } },
     { name: "mobile", use: { ...devices["Pixel 7"] } },
+    // Safari engine: in CI, or locally with E2E_WEBKIT=1 once installed.
+    ...(process.env.CI || process.env.E2E_WEBKIT
+      ? [{ name: "webkit", use: { ...devices["Desktop Safari"] } }]
+      : []),
   ],
   webServer: {
     command: process.env.E2E_SKIP_BUILD
