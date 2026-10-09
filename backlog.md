@@ -21,13 +21,14 @@ Maat: S = ~1 dag, M = 2-3 dagen, L = ~1 week, XL = 1,5-2 weken (grove schatting 
 | E10 Projecten, opslag en export | 5 | 13 |
 | E11 Interface, toegankelijkheid en internationalisatie | 6 | 16 |
 | E12 Kwaliteit, tests en onderhoud | 6 | 16 |
-| **Totaal** | **70** | **233** |
+| E13 Foto's: inspiratie en huidig interieur | 6 | 23 |
+| **Totaal** | **76** | **256** |
 
 ## Fases
 
 - **Fase 1: Fundament**: 5 issues, 9 punten
 - **Fase 2: Kern**: 22 issues, 76 punten
-- **Fase 3: Uitbreiding**: 32 issues, 112 punten
+- **Fase 3: Uitbreiding**: 38 issues, 135 punten
 - **Fase 4: Afwerking**: 11 issues, 36 punten
 
 ---
@@ -765,3 +766,72 @@ Als bijdrager wil ik snel kunnen starten.
 - [ ] CONTRIBUTING, architectuurdoc, catalogus-uitbreiden-gids
 - [ ] Issue- en PR-templates
 - [ ] Licentie gekozen
+
+## E13: Foto's: inspiratie en huidig interieur
+
+### E13-71 Fotobibliotheek: foto's toevoegen en lokaal bewaren
+*Fase 3: Uitbreiding · maat M*
+
+Als gebruiker wil ik foto's aan mijn project toevoegen, zodat ik inspiratie en mijn huidige interieur bij de hand heb.
+
+**Acceptatiecriteria**
+- [ ] Toevoegen via slepen, plakken (Ctrl+V), bestandskiezer en camera op mobiel
+- [ ] Verkleind en gecomprimeerd (max 2000 px, WebP/JPEG) en opgeslagen in IndexedDB, nooit online
+- [ ] Datamodel: Photo-type met soort (inspiratie of huidig), optionele bron-URL en koppeling; schema-versie omhoog met migratie en tests
+- [ ] Foto's gaan mee in export/import van het projectbestand
+- [ ] EXIF-locatie wordt verwijderd bij het opslaan
+
+### E13-72 Moodboard met inspiratiefoto's (Pinterest)
+*Fase 3: Uitbreiding · maat M*
+
+Als gebruiker wil ik Pinterest-foto's en andere inspiratie verzamelen per ontwerp.
+
+**Acceptatiecriteria**
+- [ ] Moodboard per ontwerp, foto's slepen om te ordenen, notitie per foto
+- [ ] Pinterest-link opslaan als bron (alleen de link, de app haalt niets op bij Pinterest)
+- [ ] Afbeelding van een pin toevoegen door hem te slepen of te plakken vanuit de browser
+- [ ] Moodboard naast de 2D/3D-weergave te openen
+
+### E13-73 Kleurenpalet en pipet uit een foto
+*Fase 3: Uitbreiding · maat S*
+
+Als gebruiker wil ik kleuren uit een foto halen en gebruiken voor muren, vloer en meubels.
+
+**Acceptatiecriteria**
+- [ ] Automatisch palet van 5-8 kleuren per foto (lokaal, zonder AI), unit tests in /core
+- [ ] Pipet: klik in de foto en gebruik de kleur in de kleurkiezer
+- [ ] Palet van het hele moodboard
+
+### E13-74 Foto's koppelen aan kamer en muur van de huidige situatie
+*Fase 3: Uitbreiding · maat M*
+
+Als gebruiker wil ik per kamer en per muur foto's van hoe het nu is, zodat ik het model kan nabouwen en controleren.
+
+**Acceptatiecriteria**
+- [ ] Foto koppelen aan een kamer, muur (met zijde) of standpunt in de plattegrond
+- [ ] Camera-icoon in 2D met kijkrichting; klik opent de foto
+- [ ] In 3D: foto naast de render vanaf hetzelfde standpunt om te vergelijken
+- [ ] Werkt zonder AI-sleutel
+
+### E13-75 AI-fotoanalyse: huidig interieur naar het model
+*Fase 3: Uitbreiding · maat XL*
+
+Als gebruiker wil ik dat foto's van mijn huidige interieur het 3D-model invullen: wanden, vloer, plafond, ramen en vaste elementen.
+
+**Acceptatiecriteria**
+- [ ] Gebruikt de eigen API-sleutel (zelfde instelling als E07-32); per foto toestemming voordat hij wordt verstuurd
+- [ ] Herkent wandafwerking en kleur, vloertype, plafondhoogte (schatting), ramen, deuren, radiatoren, keuken en sanitair
+- [ ] Resultaat als voorstel met controle-stap (zoals E07-33), nooit automatisch toegepast
+- [ ] Maten komen uit de plattegrond; de foto vult alleen afwerking en plaatsing aan
+- [ ] Antwoord gevalideerd met een schema, foutmelding bij onzin
+
+### E13-76 AI-stijl uit inspiratie toepassen op een ontwerp
+*Fase 3: Uitbreiding · maat L*
+
+Als gebruiker wil ik dat de app de stijl van mijn moodboard begrijpt en toepast.
+
+**Acceptatiecriteria**
+- [ ] Stijl, palet en materialen uit het moodboard afleiden (met eigen API-sleutel)
+- [ ] Voorstel: stijlpreset (E09-52), wand- en vloerafwerking en generieke meubels uit de catalogus
+- [ ] Toepassen op een nieuw ontwerp, nooit op de huidige situatie
+- [ ] Zonder sleutel: alleen palet en handmatig kiezen
