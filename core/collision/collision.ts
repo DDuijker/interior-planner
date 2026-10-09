@@ -135,7 +135,11 @@ export function checkLayout(
     return rb === undefined || rb === ra;
   };
   const items = floorItems.map((i) => shape(i.id, itemFootprint(i)));
+  // Lamps, plants and other decor do not block a passage in a meaningful way.
+  const decorIds = new Set(floorItems.filter((i) => i.layer !== "furniture").map((i) => i.id));
+  const narrowsPassage = (id: Id) => !decorIds.has(id);
   const fixtures = input.fixtures.map((f) => shape(f.id, fixtureFootprint(f)));
+
   const wallPieces = cutWalls(input.walls, input.openings).map((p) =>
     shape(p.wallId, rectPolygon(p.rect)),
   );
@@ -145,6 +149,7 @@ export function checkLayout(
     if (!rectsOverlap(grow(a.box, reach), b.box)) return null;
     if (convexOverlap(a.poly, b.poly, opts.tolerance)) return { type: hitType, gap: 0 };
     if (!sameSpace(a.id, b.id)) return null;
+    if (!narrowsPassage(a.id) || !narrowsPassage(b.id)) return null;
     const gap = polygonDistance(a.poly, b.poly);
     if (gap >= opts.againstGap && gap < opts.clearance) return { type: "clearance" as const, gap };
     return null;

@@ -30,6 +30,9 @@ npm run dev        # http://localhost:3000
 | `npm run test:coverage` | Unit tests with coverage on `/core` (85% minimum)      |
 | `npm run e2e`           | Playwright end-to-end tests (builds and serves `out/`) |
 
+The editor opens a sample apartment at `/editor/`. Add `?stress=150` to load 150
+extra chairs for performance checks.
+
 A pre-commit hook (husky + lint-staged) runs ESLint and Prettier on staged files.
 
 ## Architecture

@@ -251,3 +251,17 @@ describe("rooms", () => {
     expect(overlapping.map((i) => i.type)).toContain("overlap");
   });
 });
+
+describe("passage warnings", () => {
+  it("only consider furniture, not lamps or decor", () => {
+    const sofa = item("sofa", 0, 0, 200, 90);
+    const lamp = item("lamp", 0, 110, 30, 30, { layer: "lighting", shape: "round" });
+    expect(checkLayout({ ...empty, items: [sofa, lamp] })).toEqual([]);
+    expect(checkLayout({ ...empty, items: [lamp, sofa] })).toEqual([]);
+    // But a lamp inside the sofa is still an overlap.
+    const inside = item("lamp2", 0, 0, 30, 30, { layer: "lighting" });
+    expect(checkLayout({ ...empty, items: [sofa, inside] }).map((i) => i.type)).toEqual([
+      "overlap",
+    ]);
+  });
+});

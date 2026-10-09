@@ -43,3 +43,10 @@ describe("detectLocale", () => {
     expect(detectLocale(["fr"])).toBe("nl");
   });
 });
+
+describe("editor texts", () => {
+  it("has a label for every shortcut action", async () => {
+    const { SHORTCUT_ACTIONS } = await import("@/core/editor/shortcuts");
+    for (const action of SHORTCUT_ACTIONS) expect(messages.nl).toHaveProperty(`shortcut.${action}`);
+  });
+});

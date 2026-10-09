@@ -337,3 +337,511 @@ select.input {
   gap: var(--space-2);
   align-items: center;
 }
+
+/* ------------------------------------------------------------- editor */
+
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--touch);
+  font-size: var(--font-sm);
+  cursor: pointer;
+}
+.check input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--c-accent);
+}
+.inline-select .input {
+  width: auto;
+  min-width: 5.5em;
+}
+.link-button {
+  background: none;
+  border: 0;
+  padding: var(--space-1) 0;
+  min-height: var(--touch);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: var(--c-line);
+}
+
+.editor {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100dvh;
+  overflow: hidden;
+}
+.editor-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-1) var(--space-3);
+  background: var(--c-panel);
+  border-bottom: 1px solid var(--c-line);
+  overflow-x: auto;
+}
+.editor-brand {
+  font-size: var(--font-lg);
+  color: var(--c-text);
+  text-decoration: none;
+  margin: 0;
+  white-space: nowrap;
+}
+.editor-tools {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1;
+}
+.tool-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding-right: var(--space-2);
+  border-right: 1px solid var(--c-line);
+}
+.tool-group:last-child {
+  border-right: 0;
+  margin-left: auto;
+}
+.tool-group-settings {
+  gap: var(--space-2);
+}
+.panel-toggle {
+  display: none;
+}
+
+.editor-main {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  min-height: 0;
+}
+.editor-canvas {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  background: var(--c-bg);
+}
+.editor-canvas:focus-visible {
+  outline-offset: -3px;
+}
+.plan-wrap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.plan-svg {
+  display: block;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.plan-hint {
+  position: absolute;
+  top: var(--space-3);
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: var(--space-1) var(--space-3);
+  background: var(--c-panel);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-sm);
+}
+
+.editor-panel {
+  background: var(--c-panel);
+  border-left: 1px solid var(--c-line);
+  overflow-y: auto;
+  padding: var(--space-3) var(--space-4) var(--space-6);
+}
+.panel-section {
+  border-bottom: 1px solid var(--c-line);
+  padding: var(--space-3) 0;
+}
+.panel-title {
+  font-family: var(--font-cormorant), Georgia, serif;
+  font-size: var(--font-lg);
+  font-weight: 600;
+  margin: 0 0 var(--space-2);
+  cursor: default;
+}
+summary.panel-title {
+  cursor: pointer;
+  min-height: var(--touch);
+  display: flex;
+  align-items: center;
+}
+.panel-subtitle {
+  font-size: var(--font-md);
+  margin-top: var(--space-3);
+}
+.props-grid {
+  display: grid;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+.props-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+}
+.warnings,
+.object-list,
+.layer-list,
+.room-list,
+.legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.warning {
+  border-left: 3px solid var(--c-warn);
+  padding-left: var(--space-2);
+  margin: var(--space-1) 0;
+  font-size: var(--font-sm);
+}
+.warning-clearance {
+  border-left-style: dashed;
+  border-left-color: var(--c-brass);
+}
+.object-button {
+  width: 100%;
+  min-height: var(--touch);
+  text-align: left;
+  background: none;
+  border: 0;
+  border-radius: var(--radius-sm);
+  padding: 0 var(--space-2);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.object-button[aria-pressed="true"] {
+  background: var(--c-accent-soft);
+  font-weight: 600;
+}
+.layer-row,
+.room-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.layer-row span,
+.room-name {
+  flex: 1;
+}
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  font-size: var(--font-sm);
+}
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.swatch-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: 1px solid var(--c-line);
+  flex: none;
+}
+
+.context-menu {
+  position: absolute;
+  z-index: 20;
+  min-width: 200px;
+  background: var(--c-panel);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-1);
+  display: flex;
+  flex-direction: column;
+}
+.context-menu-item {
+  min-height: var(--touch);
+  text-align: left;
+  padding: 0 var(--space-3);
+  background: none;
+  border: 0;
+  border-radius: var(--radius-sm);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.context-menu-item:hover:not(:disabled),
+.context-menu-item:focus-visible {
+  background: var(--c-accent-soft);
+}
+.context-menu-item:disabled {
+  color: var(--c-text-muted);
+  cursor: not-allowed;
+}
+
+.shortcuts {
+  width: 100%;
+  border-collapse: collapse;
+}
+.shortcuts th,
+.shortcuts td {
+  text-align: left;
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--c-line);
+  font-weight: 400;
+}
+kbd {
+  font-family: inherit;
+  font-size: var(--font-sm);
+  border: 1px solid var(--c-line);
+  border-bottom-width: 2px;
+  border-radius: var(--radius-sm);
+  padding: 1px 6px;
+  margin-right: var(--space-1);
+  background: var(--c-bg);
+}
+
+.minimap {
+  position: absolute;
+  right: var(--space-3);
+  bottom: var(--space-3);
+  background: var(--c-panel);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+}
+.minimap-view {
+  fill: rgb(77 104 87 / 0.12);
+  stroke: var(--c-accent);
+}
+
+/* Plan drawing. Stroke widths are set in screen pixels by the canvas. */
+.plan-grid-line {
+  fill: none;
+  stroke: var(--c-line);
+  opacity: 0.7;
+}
+.plan-room {
+  stroke: none;
+}
+:root[data-theme="dark"] .plan-room,
+:root[data-theme="dark"] .minimap path {
+  opacity: 0.18;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .plan-room,
+  :root:not([data-theme="light"]) .minimap path {
+    opacity: 0.18;
+  }
+}
+.plan-wall {
+  fill: var(--c-plan-wall);
+}
+.plan-wall-low {
+  fill: var(--c-olive);
+}
+.plan-window rect {
+  fill: var(--c-plan-floor);
+  stroke: var(--c-plan-wall);
+}
+.plan-window path,
+.plan-glass path {
+  stroke: var(--c-plan-wall);
+  fill: none;
+}
+.plan-glass rect {
+  fill: var(--c-accent-soft);
+  stroke: var(--c-accent);
+}
+.plan-door-gap {
+  fill: var(--c-bg);
+}
+.plan-door-leaf {
+  stroke: var(--c-plan-wall);
+  stroke-width: calc(var(--px) * 2);
+  fill: none;
+}
+.plan-door-arc {
+  stroke: var(--c-text-muted);
+  stroke-dasharray: calc(var(--px) * 4) calc(var(--px) * 3);
+  fill: none;
+}
+.plan-fixture rect,
+.plan-fixture ellipse,
+.plan-fixture path {
+  fill: var(--c-panel);
+  stroke: var(--c-text-muted);
+}
+.plan-fixture path {
+  fill: none;
+}
+.plan-fixture.is-unlocked > rect {
+  stroke-dasharray: calc(var(--px) * 5) calc(var(--px) * 3);
+}
+.plan-item rect,
+.plan-item ellipse {
+  stroke: var(--c-text);
+  fill-opacity: 0.92;
+}
+.plan-item-back {
+  stroke: var(--c-text);
+  stroke-width: calc(var(--px) * 3);
+}
+.plan-item-wall rect {
+  stroke: var(--c-brass);
+}
+.plan-item-stack rect,
+.plan-item-stack ellipse {
+  stroke-dasharray: calc(var(--px) * 3) calc(var(--px) * 2);
+}
+.plan-item-name {
+  fill: var(--c-text);
+  paint-order: stroke;
+  stroke: var(--c-panel);
+  stroke-width: calc(var(--px) * 3);
+  pointer-events: none;
+}
+.plan-item.is-conflict rect,
+.plan-item.is-conflict ellipse,
+.plan-fixture.is-conflict rect {
+  stroke: var(--c-warn);
+  stroke-width: calc(var(--px) * 2.5);
+}
+.plan-item-conflict-mark {
+  stroke: var(--c-warn);
+  stroke-width: calc(var(--px) * 1.5);
+  stroke-dasharray: calc(var(--px) * 4) calc(var(--px) * 3);
+  pointer-events: none;
+}
+.plan-selection {
+  fill: none;
+  stroke: var(--c-accent);
+  pointer-events: none;
+}
+.plan-label {
+  cursor: move;
+}
+.plan-label-name {
+  fill: var(--c-text);
+  font-weight: 700;
+}
+.plan-label-area {
+  fill: var(--c-text-muted);
+}
+.plan-dimensions path {
+  stroke: var(--c-brass);
+  stroke-dasharray: calc(var(--px) * 4) calc(var(--px) * 2);
+}
+.plan-dimensions text {
+  fill: var(--c-text);
+  paint-order: stroke;
+  stroke: var(--c-bg);
+  stroke-width: calc(var(--px) * 3);
+}
+.plan-handle rect,
+.plan-handle circle:not(.plan-handle-hit) {
+  fill: var(--c-panel);
+  stroke: var(--c-accent);
+}
+.plan-handle-hit {
+  fill: transparent;
+}
+.plan-handle-n,
+.plan-handle-s {
+  cursor: ns-resize;
+}
+.plan-handle-e,
+.plan-handle-w {
+  cursor: ew-resize;
+}
+.plan-handle-ne,
+.plan-handle-sw {
+  cursor: nesw-resize;
+}
+.plan-handle-nw,
+.plan-handle-se {
+  cursor: nwse-resize;
+}
+.plan-handle-rotate {
+  cursor: grab;
+}
+.plan-handle-stem {
+  stroke: var(--c-accent);
+}
+.plan-marquee {
+  fill: rgb(77 104 87 / 0.1);
+  stroke: var(--c-accent);
+  stroke-dasharray: calc(var(--px) * 4) calc(var(--px) * 3);
+}
+.plan-measure path {
+  stroke: var(--c-wood);
+}
+.plan-measure circle {
+  fill: var(--c-wood);
+}
+.plan-measure text {
+  fill: var(--c-text);
+  font-weight: 700;
+  paint-order: stroke;
+  stroke: var(--c-bg);
+  stroke-width: calc(var(--px) * 4);
+}
+
+@media (max-width: 760px) {
+  .editor-bar,
+  .editor-tools {
+    flex-wrap: wrap;
+    gap: var(--space-1);
+  }
+  .editor-bar {
+    overflow-x: visible;
+  }
+  .tool-group {
+    border-right: 0;
+    padding-right: 0;
+  }
+  .tool-group:last-child {
+    margin-left: 0;
+  }
+  .editor-main {
+    grid-template-columns: 1fr;
+  }
+  .panel-toggle {
+    display: inline-flex;
+  }
+  .tool-group-settings .check {
+    font-size: var(--font-xs);
+  }
+  .editor-panel {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    max-height: 60dvh;
+    border-left: 0;
+    border-top: 1px solid var(--c-line);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    box-shadow: var(--shadow-md);
+    transform: translateY(100%);
+    visibility: hidden;
+    transition:
+      transform 0.2s,
+      visibility 0.2s;
+    z-index: 30;
+  }
+  .editor-panel.is-open {
+    transform: none;
+    visibility: visible;
+  }
+  .minimap {
+    display: none;
+  }
+}
