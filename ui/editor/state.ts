@@ -51,6 +51,10 @@ export interface EditorState {
   fixture: Id | null;
   /** Show the floor below as a ghost in 2D. */
   ghost: boolean;
+  /** Photo open in the photos view (E13). */
+  photo: Id | null;
+  /** Moodboard strip next to 2D and 3D. */
+  moodboardOpen: boolean;
 }
 
 export type EditorAction =
@@ -63,7 +67,8 @@ export type EditorAction =
   | { type: "select"; ids: Id[]; additive?: boolean }
   | { type: "tool"; tool: Tool }
   | { type: "camera"; camera: Camera }
-  | { type: "toggle"; key: "showGrid" | "showLabels" | "showMinimap" | "ghost" }
+  | { type: "toggle"; key: "showGrid" | "showLabels" | "showMinimap" | "ghost" | "moodboardOpen" }
+  | { type: "openPhoto"; photo: Id | null; view?: View }
   | { type: "view"; view: View }
   | { type: "pickWall"; wall: WallPick | null }
   | { type: "pickRoom"; room: Id | null }
@@ -86,6 +91,8 @@ export function initialEditorState(project: Project): EditorState {
     opening: null,
     fixture: null,
     ghost: true,
+    photo: null,
+    moodboardOpen: false,
   };
 }
 
@@ -146,6 +153,8 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
       return { ...state, [action.key]: !state[action.key] };
     case "view":
       return { ...state, view: action.view };
+    case "openPhoto":
+      return { ...state, photo: action.photo, view: action.view ?? state.view };
     case "pickWall":
       return {
         ...state,

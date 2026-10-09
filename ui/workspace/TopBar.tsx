@@ -48,6 +48,8 @@ export function TopBar({
   onImport,
   onExport,
   onHelp,
+  moodboardOpen,
+  onMoodboard,
 }: {
   project: Project;
   apply: (update: (p: Project) => Project) => void;
@@ -58,6 +60,8 @@ export function TopBar({
   onImport: () => void;
   onExport: () => void;
   onHelp: () => void;
+  moodboardOpen?: boolean;
+  onMoodboard?: () => void;
 }) {
   const { t, locale } = useI18n();
   const [floorsOpen, setFloorsOpen] = useState(false);
@@ -157,6 +161,14 @@ export function TopBar({
           <Button variant="primary" onClick={onSave}>
             {t("common.save")}
           </Button>
+        )}
+        {onMoodboard && (
+          <IconButton
+            icon="palette"
+            label={t("moodboard.toggle")}
+            pressed={!!moodboardOpen}
+            onClick={onMoodboard}
+          />
         )}
         <IconButton icon="upload" label={t("workspace.import")} onClick={onImport} />
         <IconButton icon="download" label={t("workspace.export")} onClick={onExport} />

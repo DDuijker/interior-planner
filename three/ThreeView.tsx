@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { roomLabelAnchor } from "@/core/editor/rooms";
 import { moveItems, setActiveFloor } from "@/core/model/actions";
-import type { Id } from "@/core/model/types";
+import type { Id, Point } from "@/core/model/types";
+import { standpointView } from "@/core/photos/photos";
 import {
   adjustQuality,
   birdView,
@@ -32,9 +33,12 @@ function supportsWebGL(): boolean {
 export function ThreeView({
   panelOpen,
   onTogglePanel,
+  standpoint,
 }: {
   panelOpen: boolean;
   onTogglePanel: () => void;
+  /** Look from here at eye height, e.g. where a photo was taken (E13-74). */
+  standpoint?: { at: Point; dir: number };
 }) {
   const { t } = useI18n();
   const ws = useWorkspace();
@@ -42,6 +46,7 @@ export function ThreeView({
   const { settings: app } = useSettings();
   const hostRef = useRef<HTMLDivElement>(null);
   const engineRef = useRef<Engine | null>(null);
+  const standpointRef = useRef(standpoint);
   const [failed, setFailed] = useState(false);
   const [mode, setMode] = useState<StackMode>("single");
   const [hidden, setHidden] = useState<Set<string>>(new Set());
@@ -100,7 +105,12 @@ export function ThreeView({
     engineRef.current = engine;
     engine.setProject(projectRef.current);
     const b = engine.bounds();
-    engine.goTo(birdView(b, engine.baseOf(projectRef.current.activeFloorId)), false);
+    const base = engine.baseOf(projectRef.current.activeFloorId);
+    const sp = standpointRef.current;
+    engine.goTo(
+      sp ? standpointView(sp, projectRef.current.settings.eyeHeight, base) : birdView(b, base),
+      false,
+    );
     ws.registerCapture("3d", (scale) => engine.capture(scale));
     return () => {
       ws.registerCapture("3d", null);
@@ -110,6 +120,14 @@ export function ThreeView({
     // The engine lives for the whole view; options are pushed below.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    standpointRef.current = standpoint;
+    const engine = engineRef.current;
+    if (!engine || !standpoint) return;
+    const p = projectRef.current;
+    engine.goTo(standpointView(standpoint, p.settings.eyeHeight, engine.baseOf(p.activeFloorId)));
+  }, [standpoint]);
 
   useEffect(() => {
     engineRef.current?.setOptions({ mode, hidden, quality, hour, evening, dollhouse, shadows });

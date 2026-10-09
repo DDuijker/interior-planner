@@ -74,6 +74,7 @@ import {
   snapOpening,
   type WallPiece,
 } from "@/core/openings/openings";
+import { photosOnFloor } from "@/core/photos/photos";
 import { generateWalls, isHorizontal } from "@/core/walls/generate";
 import { useI18n } from "@/i18n/I18nProvider";
 import { Button } from "@/ui/components/Button";
@@ -91,6 +92,7 @@ import {
   WallsLayer,
 } from "./layers";
 import { Minimap } from "./Minimap";
+import { PhotoMarkers } from "./PhotoMarkers";
 import type { EditorAction, EditorState } from "./state";
 
 export type ContextTarget = {
@@ -393,6 +395,11 @@ export function PlanCanvas({
     if (tool === "room-poly" || tool === "wall") return; // handled on click (pointerup)
 
     // ---- select tool
+    const photoId = (e.target as Element).closest<SVGElement>("[data-photo]")?.dataset.photo;
+    if (photoId) {
+      dispatch({ type: "openPhoto", photo: photoId, view: "photos" });
+      return;
+    }
     const handleTarget = (e.target as Element).closest<SVGElement>("[data-handle]");
     const handle = handleTarget?.dataset.handle;
     if (handle === "wall-move" && pickedWall) {
@@ -811,6 +818,7 @@ export function PlanCanvas({
   const stairsBelow = ghost?.version.fixtures.filter((f) => f.type === "stairs") ?? [];
 
   const roomName = useCallback((room: Room) => room.name || t(`room.${room.type}`), [t]);
+  const linkedPhotos = useMemo(() => photosOnFloor(project, project.activeFloorId), [project]);
   const drawing = DRAW_TOOLS.has(tool);
   const cursor = spaceHeld || tool === "pan" ? "grab" : tool === "select" ? "default" : "crosshair";
   const bearing = version.wallFlags;
@@ -910,6 +918,16 @@ export function PlanCanvas({
           ))}
           {state.showLabels && (
             <RoomLabels rooms={version.rooms} unit={unit} px={px} names={roomName} />
+          )}
+          {linkedPhotos.length > 0 && (
+            <PhotoMarkers
+              photos={linkedPhotos}
+              rooms={version.rooms}
+              walls={walls}
+              px={px}
+              label={(p) => t("photos.marker", { name: p.name })}
+              onOpen={(id) => dispatch({ type: "openPhoto", photo: id, view: "photos" })}
+            />
           )}
           {selection.map((id) => {
             const item = version.items.find((i) => i.id === id);

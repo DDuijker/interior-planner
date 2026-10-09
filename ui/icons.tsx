@@ -52,6 +52,10 @@ const paths = {
     "M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z",
   floors: "M4 15l8 4 8-4M4 11l8 4 8-4M12 3l8 4-8 4-8-4z",
   hammer: "M14 4l6 6-3 3-6-6zM11 7L3 15l3 3 8-8",
+  left: "M15 5l-7 7 7 7",
+  right: "M9 5l7 7-7 7",
+  link: "M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1",
+  eyedropper: "M15 4l5 5-2 2-5-5zM13 6l-8 8-1 5 5-1 8-8",
 } as const;
 
 export type IconName = keyof typeof paths;

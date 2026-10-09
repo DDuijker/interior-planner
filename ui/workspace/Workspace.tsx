@@ -60,6 +60,10 @@ const StyleView = dynamic(() => import("@/ui/style/StyleView").then((m) => m.Sty
   ssr: false,
   loading: () => <Loading />,
 });
+const MoodboardStrip = dynamic(
+  () => import("@/ui/photos/MoodboardStrip").then((m) => m.MoodboardStrip),
+  { ssr: false },
+);
 const PhotosView = dynamic(() => import("@/ui/photos/PhotosView").then((m) => m.PhotosView), {
   ssr: false,
   loading: () => <Loading />,
@@ -463,6 +467,10 @@ export function Workspace({
           onImport={() => setDialog("import")}
           onExport={() => setDialog("export")}
           onHelp={() => setHelp(true)}
+          moodboardOpen={state.moodboardOpen}
+          {...(showSidebar
+            ? { onMoodboard: () => dispatch({ type: "toggle", key: "moodboardOpen" }) }
+            : {})}
         />
         {state.view === "plan" && (
           <Toolbar
@@ -545,6 +553,9 @@ export function Workspace({
           )}
           {state.view === "style" && <StyleView />}
           {state.view === "photos" && <PhotosView />}
+          {showSidebar && state.moodboardOpen && (
+            <MoodboardStrip onClose={() => dispatch({ type: "toggle", key: "moodboardOpen" })} />
+          )}
           {showSidebar && (
             <SidePanel
               project={project}

@@ -67,3 +67,13 @@ export function updatePalette(index: number, p: Palette) {
 export function removePalette(index: number) {
   save(load().filter((_, i) => i !== index));
 }
+
+/** Add a colour to the user palette with this name, creating it if needed. */
+export function addToPalette(name: string, color: string) {
+  const all = load();
+  const i = all.findIndex((p) => p.name === name);
+  if (i < 0) return save([...all, { name, colors: [color] }]);
+  const p = all[i]!;
+  if (p.colors.includes(color)) return;
+  updatePalette(i, { ...p, colors: [color, ...p.colors].slice(0, 24) });
+}
