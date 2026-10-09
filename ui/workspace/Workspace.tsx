@@ -49,6 +49,7 @@ import { useSettings } from "@/ui/settings/settings";
 import { CustomBuilder } from "./CustomBuilder";
 import { ExportDialog } from "./ExportDialog";
 import { ImportDialog } from "./ImportDialog";
+import { EmptyPlanTip, Onboarding } from "./Onboarding";
 import { TopBar, type SaveStatus } from "./TopBar";
 import { WorkspaceContext, type Capture } from "./context";
 
@@ -546,6 +547,12 @@ export function Workspace({
               {menu && (
                 <ContextMenu at={menu.at} entries={menuEntries(menu.target)} onClose={closeMenu} />
               )}
+              {version.rooms.length === 0 && (
+                <EmptyPlanTip
+                  onImport={() => setDialog("import")}
+                  onDraw={() => dispatch({ type: "tool", tool: "room-rect" })}
+                />
+              )}
             </div>
           )}
           {state.view === "3d" && (
@@ -583,6 +590,7 @@ export function Workspace({
             />
           )}
         </main>
+        {persist && <Onboarding />}
         <ShortcutsDialog open={help} onClose={() => setHelp(false)} isMac={isMac} />
         {dialog === "export" && <ExportDialog onClose={() => setDialog(null)} />}
         {dialog === "import" && <ImportDialog onClose={() => setDialog(null)} />}

@@ -19,18 +19,19 @@ test("home links to the editor without console errors", async ({ page }) => {
   const errors = trackErrors(page);
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "Maison" })).toBeVisible();
-  await page.getByRole("link", { name: "Open sample floor plan" }).click();
-  await expect(page.locator('[data-item="sofa"]')).toBeVisible();
+  await page.locator('[data-sample="apartment"]').click();
+  await expect(page.locator(".plan-svg[data-ready]")).toBeVisible();
+  await expect(page.locator("[data-item]").first()).toBeVisible();
   await expect(page.getByText("Living room").or(page.getByText("Woonkamer")).first()).toBeVisible();
   expect(errors).toEqual([]);
 });
 
 test("switches language to Dutch and remembers it", async ({ page }) => {
+  await page.goto("/settings/");
+  await page.getByRole("combobox", { name: /^Language/ }).selectOption("nl");
+  await expect(page.getByRole("heading", { name: "Instellingen" })).toBeVisible();
   await page.goto("/");
-  await page.getByLabel("Language").selectOption("nl");
-  await expect(page.getByRole("link", { name: "Open voorbeeldplattegrond" })).toBeVisible();
-  await page.reload();
-  await expect(page.getByRole("link", { name: "Open voorbeeldplattegrond" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Instellingen" })).toBeVisible();
 });
 
 test.describe("desktop editing", () => {
@@ -60,11 +61,8 @@ test.describe("desktop editing", () => {
 
   test("nudges with the arrow keys", async ({ page }) => {
     await openEditor(page);
-    await page
-      .getByRole("button", { name: "Objects" })
-      .or(page.getByText("Objects"))
-      .first()
-      .click();
+    await page.getByRole("tab", { name: "Overview" }).click();
+    await page.getByText("Objects", { exact: true }).click();
     await page.getByRole("button", { name: "Bed 160x200" }).click();
     await page.locator("#plan").focus();
     await page.keyboard.press("ArrowRight");
@@ -113,7 +111,8 @@ test.describe("desktop editing", () => {
 
   test("hides a layer", async ({ page }) => {
     await openEditor(page);
-    await page.getByText("Layers").click();
+    await page.getByRole("tab", { name: "Overview" }).click();
+    await page.getByText("Layers", { exact: true }).click();
     await page.getByRole("button", { name: "Hide layer Decor" }).click();
     await expect(page.locator('[data-item="plant"]')).toHaveCount(0);
     await page.getByRole("button", { name: "Show layer Decor" }).click();
@@ -170,4 +169,23 @@ test.describe("mobile", () => {
     await page.getByRole("button", { name: "Side panel" }).click();
     await expect(page.getByText("1 selected")).toBeVisible();
   });
+});
+
+test("a new empty project shows the tour and a way to start", async ({ page }) => {
+  const errors = trackErrors(page);
+  await page.goto("/");
+  await page.getByRole("button", { name: /^Empty project/ }).click();
+  await expect(page.getByRole("heading", { name: "No rooms yet" })).toBeVisible();
+  const tour = page.getByRole("dialog", { name: "1. Load a floor plan" });
+  await expect(tour).toBeVisible();
+  await tour.getByRole("button", { name: "Next" }).click();
+  await expect(page.getByRole("heading", { name: "2. Draw and furnish" })).toBeVisible();
+  await page.getByRole("button", { name: "Close the tour" }).click();
+  await expect(page.locator(".tour")).toHaveCount(0);
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "No rooms yet" })).toBeVisible();
+  await expect(page.locator(".tour")).toHaveCount(0);
+  await page.getByRole("button", { name: "Load a floor plan" }).click();
+  await expect(page.getByRole("tab", { name: "Plan-code" })).toBeVisible();
+  expect(errors).toEqual([]);
 });

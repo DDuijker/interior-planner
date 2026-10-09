@@ -1888,3 +1888,48 @@ button.swatch-dot.big {
 .editor-main {
   position: relative;
 }
+
+/* ---------------------------------------------------------- tour, empty plan */
+.tour {
+  position: fixed;
+  left: var(--space-3);
+  bottom: var(--space-3);
+  width: min(340px, calc(100vw - 32px));
+  background: var(--c-panel);
+  border: 1px solid var(--c-line);
+  border-left: 4px solid var(--c-accent);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-4);
+  box-shadow: 0 8px 24px rgb(42 38 32 / 0.15);
+  z-index: 20;
+}
+.tour-head,
+.tour-foot {
+  justify-content: space-between;
+  flex-wrap: nowrap;
+}
+.empty-plan {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  padding: var(--space-4);
+}
+.empty-plan-card {
+  pointer-events: auto;
+  max-width: 420px;
+  background: var(--c-panel);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  text-align: center;
+}
+.empty-plan-card .row {
+  justify-content: center;
+}
+.crash {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}

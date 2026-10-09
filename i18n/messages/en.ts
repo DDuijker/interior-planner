@@ -793,4 +793,37 @@ export const en: Record<MessageKey, string> = {
   "photos.ai.el.column": "Column",
   "photos.ai.el.stairs": "Stairs",
   "photos.ai.el.chimney": "Chimney",
+  "crash.title": "Something went wrong",
+  "crash.body":
+    "The app got stuck. Your work is still in this browser, except the last few seconds. Try again, or make an emergency export first.",
+  "crash.retry": "Try again",
+  "crash.reload": "Reload page",
+  "crash.export": "Emergency export of all projects",
+  "crash.exported": "{count} project(s) downloaded",
+  "crash.makeReport": "Prepare an error report",
+  "crash.report": "Error report",
+  "crash.copy": "Copy",
+  "crash.reportHint":
+    "This report is not sent. Keys, e-mail addresses and links to your projects have been removed. Share it yourself if you like.",
+  "tour.load.title": "1. Load a floor plan",
+  "tour.load.body":
+    "With Import (arrow up) you paste plan-code or let Claude read a photo or PDF. You can also draw rooms yourself.",
+  "tour.draw.title": "2. Draw and furnish",
+  "tour.draw.body":
+    "Walls appear by themselves from the rooms. Drag furniture from the Catalogue onto the plan; red marks point out collisions.",
+  "tour.views.title": "3. 3D, style and photos",
+  "tour.views.body":
+    "At the top you switch between Plan, 3D, Style and Photos. Create a new design to experiment; the current situation is kept.",
+  "tour.save.title": "4. Saving and help",
+  "tour.save.body":
+    "Everything is kept in this browser. Export a project file now and then as a backup. The question mark shows the shortcuts.",
+  "tour.step": "Step {n} of {total}",
+  "tour.next": "Next",
+  "tour.back": "Back",
+  "tour.done": "Get started",
+  "tour.skip": "Close the tour",
+  "empty.title": "No rooms yet",
+  "empty.body": "Load a floor plan (plan-code or a photo via Claude) or draw your first room.",
+  "empty.import": "Load a floor plan",
+  "empty.draw": "Draw a room",
 };

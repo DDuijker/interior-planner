@@ -802,6 +802,40 @@ export const nl = {
   "photos.ai.el.column": "Kolom",
   "photos.ai.el.stairs": "Trap",
   "photos.ai.el.chimney": "Schoorsteen",
+  "crash.title": "Er ging iets mis",
+  "crash.body":
+    "De app liep vast. Je werk staat nog in deze browser, behalve de laatste paar seconden. Probeer het opnieuw, of maak eerst een nood-export.",
+  "crash.retry": "Probeer opnieuw",
+  "crash.reload": "Pagina herladen",
+  "crash.export": "Nood-export van alle projecten",
+  "crash.exported": "{count} project(en) gedownload",
+  "crash.makeReport": "Maak een foutrapport",
+  "crash.report": "Foutrapport",
+  "crash.copy": "Kopieer",
+  "crash.reportHint":
+    "Dit rapport wordt niet verstuurd. Sleutels, e-mailadressen en links naar je projecten zijn eruit gehaald. Deel het zelf als je wilt.",
+  "tour.load.title": "1. Plattegrond inladen",
+  "tour.load.body":
+    "Met Importeren (pijl omhoog) plak je plan-code of laat je Claude een foto of PDF lezen. Je kunt ook zelf kamers tekenen.",
+  "tour.draw.title": "2. Tekenen en inrichten",
+  "tour.draw.body":
+    "Muren ontstaan vanzelf uit de kamers. Sleep meubels uit de Catalogus op de plattegrond; rode markeringen wijzen op botsingen.",
+  "tour.views.title": "3. 3D, stijl en foto's",
+  "tour.views.body":
+    "Bovenin wissel je tussen Plan, 3D, Stijl en Foto's. Maak een nieuw ontwerp om te experimenteren; de huidige situatie blijft bewaard.",
+  "tour.save.title": "4. Opslaan en hulp",
+  "tour.save.body":
+    "Alles wordt in deze browser bewaard. Exporteer af en toe een projectbestand als back-up. Het vraagteken toont de sneltoetsen.",
+  "tour.step": "Stap {n} van {total}",
+  "tour.next": "Volgende",
+  "tour.back": "Terug",
+  "tour.done": "Aan de slag",
+  "tour.skip": "Rondleiding sluiten",
+  "empty.title": "Nog geen kamers",
+  "empty.body":
+    "Laad een plattegrond in (plan-code of een foto via Claude) of teken je eerste kamer.",
+  "empty.import": "Plattegrond inladen",
+  "empty.draw": "Teken een kamer",
 } as const;
 
 export type MessageKey = keyof typeof nl;
