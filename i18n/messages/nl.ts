@@ -237,8 +237,11 @@ export const nl = {
   "draw.notL": "Teken de uitsparing in een hoek van de rechthoek.",
   "draw.roomsFound": "{count} kamers gemaakt",
   "draw.tooSmall": "Te klein voor een kamer.",
+  "draw.stairsTooSmall": "Te klein voor een trap (minimaal 60 x 100 cm).",
   "draw.vertex": "Hoekpunt verslepen",
   "draw.hint.room-rect": "Sleep een rechthoek voor een nieuwe kamer.",
+  "draw.hint.stairs":
+    "Sleep een rechthoek over de plek van de trap. Richting en vorm pas je daarna aan.",
   "draw.hint.room-l": "Sleep eerst de hele rechthoek, daarna de uitsparing in een hoek.",
   "draw.hint.room-poly":
     "Klik de hoekpunten. Klik op het eerste punt of druk Enter om af te sluiten.",
@@ -248,6 +251,7 @@ export const nl = {
   "draw.hint.window": "Klik op een muur om een raam te plaatsen.",
   "draw.hint.passage": "Klik op een muur voor een doorbraak.",
   "editor.tool.room-rect": "Kamer (rechthoek)",
+  "editor.tool.stairs": "Trap",
   "editor.tool.room-l": "Kamer (L-vorm)",
   "editor.tool.room-poly": "Kamer (vrije vorm)",
   "editor.tool.wall": "Muren tekenen",
