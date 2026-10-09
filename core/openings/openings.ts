@@ -1,5 +1,5 @@
 import { pointSegmentDistance } from "../geometry/polygon";
-import { subtractInterval } from "../geometry/rect";
+import { subtractInterval, subtractRect } from "../geometry/rect";
 import { newId } from "../model/ids";
 import type { Axis, Door, Id, Opening, Point, Rect, Wall, WallKind, Window } from "../model/types";
 import { isHorizontal } from "../walls/generate";
@@ -153,9 +153,10 @@ export function cutWalls(
   walls: readonly Wall[],
   openings: readonly Opening[],
   threeD = false,
+  demolitions: readonly Rect[] = [],
 ): WallPiece[] {
   const out: WallPiece[] = [];
-  for (const wall of walls) {
+  for (const wall of demolish(walls, demolitions)) {
     const horizontal = isHorizontal(wall.rect);
     const start = horizontal ? wall.rect.x : wall.rect.y;
     const end = horizontal ? wall.rect.x + wall.rect.w : wall.rect.y + wall.rect.d;
@@ -194,6 +195,21 @@ export function cutWalls(
         });
       }
     }
+  }
+  return out;
+}
+
+/**
+ * Remove demolished areas from walls. A wall that is cut in two keeps its id
+ * on both parts, so finishes still apply.
+ */
+export function demolish(walls: readonly Wall[], demolitions: readonly Rect[]): Wall[] {
+  if (!demolitions.length) return [...walls];
+  const out: Wall[] = [];
+  for (const wall of walls) {
+    let rects: Rect[] = [wall.rect];
+    for (const d of demolitions) rects = rects.flatMap((r) => subtractRect(r, d));
+    for (const rect of rects) out.push({ ...wall, rect });
   }
   return out;
 }

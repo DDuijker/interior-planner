@@ -19,6 +19,7 @@ import {
   unionArea,
   boundingRectOfPoints,
   rectCenter,
+  subtractRect,
 } from "./index";
 import type { Rect } from "../model/types";
 
@@ -216,6 +217,32 @@ describe("polygons", () => {
           return Math.abs(polygonArea(orientedBox(0, 0, w, d, r)) - w * d) < 1e-6 * w * d;
         },
       ),
+    );
+  });
+});
+
+describe("subtractRect", () => {
+  const a = { x: 0, y: 0, w: 100, d: 100 };
+  it("cuts a hole into up to four parts covering the rest", () => {
+    const parts = subtractRect(a, { x: 40, y: 40, w: 20, d: 20 });
+    expect(parts).toHaveLength(4);
+    expect(unionArea(parts)).toBe(10000 - 400);
+  });
+  it("handles no overlap and full cover", () => {
+    expect(subtractRect(a, { x: 200, y: 0, w: 10, d: 10 })).toEqual([a]);
+    expect(subtractRect(a, { x: -10, y: -10, w: 200, d: 200 })).toEqual([]);
+  });
+  it("property: area of the rest is area minus overlap", () => {
+    fc.assert(
+      fc.property(arbRect, arbRect, (r, s) => {
+        const rest = subtractRect(r, s);
+        const ox = Math.max(0, Math.min(r.x + r.w, s.x + s.w) - Math.max(r.x, s.x));
+        const oy = Math.max(0, Math.min(r.y + r.d, s.y + s.d) - Math.max(r.y, s.y));
+        return (
+          Math.abs(unionArea(rest) - (rectArea(r) - ox * oy)) < 1e-6 &&
+          rest.reduce((t, x) => t + rectArea(x), 0) - unionArea(rest) < 1e-6
+        );
+      }),
     );
   });
 });

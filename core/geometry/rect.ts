@@ -102,3 +102,20 @@ export function subtractInterval(
   if (end - cutEnd > minLength) out.push([cutEnd, end]);
   return out;
 }
+
+/** `a` minus `b`: up to four rectangles covering what is left of `a`. */
+export function subtractRect(a: Rect, b: Rect): Rect[] {
+  if (!rectsOverlap(a, b)) return [a];
+  const out: Rect[] = [];
+  const ax2 = a.x + a.w,
+    ay2 = a.y + a.d,
+    bx2 = b.x + b.w,
+    by2 = b.y + b.d;
+  if (b.y > a.y) out.push({ x: a.x, y: a.y, w: a.w, d: b.y - a.y });
+  if (by2 < ay2) out.push({ x: a.x, y: by2, w: a.w, d: ay2 - by2 });
+  const top = Math.max(a.y, b.y),
+    bottom = Math.min(ay2, by2);
+  if (b.x > a.x) out.push({ x: a.x, y: top, w: b.x - a.x, d: bottom - top });
+  if (bx2 < ax2) out.push({ x: bx2, y: top, w: ax2 - bx2, d: bottom - top });
+  return out.filter((r) => r.w > EPS && r.d > EPS);
+}

@@ -5,6 +5,7 @@ import {
   createDoor,
   createWindow,
   cutWalls,
+  demolish,
   doorSwing,
   openingCenter,
   openingOnWall,
@@ -175,5 +176,17 @@ describe("validateOpening", () => {
     expect(
       validateOpening(createWindow(0, 0, "h", { sill: -1, lintel: 300 }), 260).map((p) => p.field),
     ).toEqual(["sill", "lintel"]);
+  });
+});
+
+describe("demolish", () => {
+  it("removes demolished parts of walls and keeps ids", () => {
+    const parts = demolish([hWall], [{ x: 100, y: 290, w: 100, d: 20 }]);
+    expect(parts.map((w) => [w.id, w.rect.x, w.rect.w])).toEqual([
+      ["h", 0, 100],
+      ["h", 200, 200],
+    ]);
+    expect(demolish([hWall], [])).toEqual([hWall]);
+    expect(cutWalls([hWall], [], false, [hWall.rect])).toEqual([]);
   });
 });

@@ -339,3 +339,93 @@ export function setWallOverride(
     else v.wallOverrides[wallId] = entry;
   });
 }
+
+export function updateFloor(
+  project: Project,
+  floorId: Id,
+  patch: Partial<Pick<Floor, "name" | "height">>,
+): Project {
+  getFloor(project, floorId);
+  return produce(project, (d) => {
+    Object.assign(
+      d.floors.find((f) => f.id === floorId)!,
+      patch,
+    );
+  });
+}
+
+/**
+ * Move a floor one place up (+1) or down (-1) in the stack. Levels are
+ * swapped with the neighbour, so the order and the level numbers stay in step.
+ */
+export function moveFloor(project: Project, floorId: Id, direction: 1 | -1): Project {
+  const sorted = [...project.floors].sort((a, b) => a.level - b.level);
+  const i = sorted.findIndex((f) => f.id === floorId);
+  if (i < 0) throw new ModelError(`Unknown floor ${floorId}`);
+  const j = i + direction;
+  if (j < 0 || j >= sorted.length) return project;
+  const a = sorted[i]!,
+    b = sorted[j]!;
+  return produce(project, (d) => {
+    const da = d.floors.find((f) => f.id === a.id)!;
+    const db = d.floors.find((f) => f.id === b.id)!;
+    [da.level, db.level] = [b.level, a.level];
+    d.floors.sort((x, y) => x.level - y.level);
+  });
+}
+
+export function renameVersion(project: Project, floorId: Id, versionId: Id, name: string): Project {
+  return produce(project, (d) => {
+    const floor = d.floors.find((f) => f.id === floorId);
+    if (!floor) throw new ModelError(`Unknown floor ${floorId}`);
+    const v =
+      floor.current.id === versionId
+        ? floor.current
+        : floor.designs.find((x) => x.id === versionId);
+    if (!v) throw new ModelError(`Unknown version ${versionId}`);
+    v.name = name;
+  });
+}
+
+/** The floor directly below `floorId`, if any. */
+export function floorBelow(project: Project, floorId: Id): Floor | undefined {
+  const floor = getFloor(project, floorId);
+  return [...project.floors]
+    .filter((f) => f.level < floor.level)
+    .sort((a, b) => b.level - a.level)[0];
+}
+
+/** The floor directly above `floorId`, if any. */
+export function floorAbove(project: Project, floorId: Id): Floor | undefined {
+  const floor = getFloor(project, floorId);
+  return [...project.floors]
+    .filter((f) => f.level > floor.level)
+    .sort((a, b) => a.level - b.level)[0];
+}
+
+/** Replace the current situation of a floor (e.g. after importing a plan). */
+export function replaceCurrent(project: Project, floorId: Id, source: Floor): Project {
+  return produce(project, (d) => {
+    const floor = d.floors.find((f) => f.id === floorId);
+    if (!floor) throw new ModelError(`Unknown floor ${floorId}`);
+    floor.current = {
+      ...source.current,
+      id: floor.current.id,
+      kind: "current",
+      name: floor.current.name,
+    };
+    floor.height = source.height;
+    floor.activeVersionId = floor.current.id;
+  });
+}
+
+/** Add floors on top of the existing ones, keeping their order. */
+export function appendFloors(project: Project, floors: readonly Floor[]): Project {
+  if (!floors.length) return project;
+  return produce(project, (d) => {
+    let level = Math.max(...d.floors.map((f) => f.level));
+    for (const f of [...floors].sort((a, b) => a.level - b.level))
+      d.floors.push({ ...f, level: ++level });
+    d.activeFloorId = d.floors[d.floors.length - floors.length]!.id;
+  });
+}

@@ -37,6 +37,14 @@ import {
   updateOpening,
   updateRoom,
   validateProject,
+  replaceCurrent,
+  appendFloors,
+  createFloor,
+  updateFloor,
+  moveFloor,
+  renameVersion,
+  floorBelow,
+  floorAbove,
   type Item,
   type Migration,
   type Project,
@@ -510,5 +518,61 @@ describe("migration 1 -> 2", () => {
     expect(v.demolitions).toEqual([]);
     expect(result.project.settings.eyeHeight).toBe(160);
     expect(result.project.photos).toEqual([]);
+  });
+});
+
+describe("floor management", () => {
+  it("renames, changes height and reorders floors", () => {
+    let p = addFloor(addFloor(createProject(), "Eerste"), "Zolder");
+    const [ground, first, attic] = p.floors;
+    p = updateFloor(p, first!.id, { name: "Eerste verdieping", height: 255 });
+    expect(getFloor(p, first!.id)).toMatchObject({ name: "Eerste verdieping", height: 255 });
+    p = moveFloor(p, attic!.id, -1);
+    expect(p.floors.map((f) => f.name)).toEqual(["Begane grond", "Zolder", "Eerste verdieping"]);
+    expect(p.floors.map((f) => f.level)).toEqual([0, 1, 2]);
+    expect(moveFloor(p, ground!.id, -1)).toBe(p);
+    expect(() => moveFloor(p, "x", 1)).toThrow(ModelError);
+    expect(floorBelow(p, attic!.id)?.id).toBe(ground!.id);
+    expect(floorAbove(p, attic!.id)?.name).toBe("Eerste verdieping");
+    expect(floorBelow(p, ground!.id)).toBeUndefined();
+  });
+
+  it("renames versions", () => {
+    const base = createProject();
+    const floorId = base.activeFloorId;
+    let p = createDesign(base, floorId, "A");
+    const id = getFloor(p).designs[0]!.id;
+    p = renameVersion(p, floorId, id, "Ontwerp licht");
+    expect(getFloor(p).designs[0]!.name).toBe("Ontwerp licht");
+    expect(() => renameVersion(p, floorId, "x", "y")).toThrow(ModelError);
+  });
+});
+
+describe("importing floors", () => {
+  it("replaces the current situation and appends floors", () => {
+    const p = withSofa();
+    const incoming = createFloor("Nieuw", 0, 270);
+    incoming.current.rooms = [
+      {
+        id: "r",
+        name: "Kamer",
+        type: "bed",
+        shape: { kind: "rects", rects: [{ x: 0, y: 0, w: 100, d: 100 }] },
+      },
+    ];
+    const replaced = replaceCurrent(p, p.activeFloorId, incoming);
+    expect(getActiveVersion(replaced).rooms).toHaveLength(1);
+    expect(getActiveVersion(replaced).items).toHaveLength(0);
+    expect(getFloor(replaced).height).toBe(270);
+    expect(getFloor(replaced).current.id).toBe(getFloor(p).current.id);
+    const appended = appendFloors(p, [incoming, createFloor("Zolder", 5)]);
+    expect(appended.floors.map((f) => [f.name, f.level])).toEqual([
+      ["Begane grond", 0],
+      ["Nieuw", 1],
+      ["Zolder", 2],
+    ]);
+    expect(appended.activeFloorId).toBe(incoming.id);
+    expect(appendFloors(p, [])).toBe(p);
+    expect(() => replaceCurrent(p, "x", incoming)).toThrow(ModelError);
   });
 });
