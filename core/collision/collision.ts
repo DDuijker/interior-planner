@@ -46,6 +46,9 @@ export interface LayoutOptions {
   tolerance: number;
 }
 
+/** Items this low (cm) are flat, like rugs. */
+const FLAT = 3;
+
 export const DEFAULT_LAYOUT_OPTIONS: LayoutOptions = {
   clearance: 80,
   againstGap: 15,
@@ -118,7 +121,8 @@ export function checkLayout(
   const opts = { ...DEFAULT_LAYOUT_OPTIONS, ...options };
   const issues: LayoutIssue[] = [];
   const rooms = input.rooms ?? [];
-  const floorItems = input.items.filter((i) => i.mount === "floor");
+  // Flat things (rugs) lie under the furniture and never collide.
+  const floorItems = input.items.filter((i) => i.mount === "floor" && i.h > FLAT);
   const roomOf = new Map<Id, Id | undefined>();
   for (const i of floorItems) roomOf.set(i.id, roomAt(rooms, i));
   for (const f of input.fixtures)
