@@ -181,7 +181,7 @@ export function cutWalls(
         e = Math.min(e0, end);
       if (e - s < MIN_PIECE) continue;
       const rect = pieceRect(wall.rect, horizontal, s, e);
-      const top = o.kind === "door" ? o.height : o.lintel;
+      const top = o.kind === "window" ? o.lintel : o.height;
       if (top < wall.height)
         out.push({ wallId: wall.id, kind: wall.kind, rect, z0: top, z1: wall.height });
       if (o.kind === "window" && o.sill > 0) {
@@ -251,7 +251,7 @@ export interface OpeningProblem {
 export function validateOpening(o: Opening, wallHeight: number): OpeningProblem[] {
   const problems: OpeningProblem[] = [];
   if (o.w <= 0) problems.push({ field: "w", message: "Width must be positive" });
-  if (o.kind === "door") {
+  if (o.kind !== "window") {
     if (o.height <= 0 || o.height > wallHeight)
       problems.push({ field: "height", message: "Door taller than wall" });
   } else {

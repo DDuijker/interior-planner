@@ -71,6 +71,19 @@ export const OpeningsLayer = memo(function OpeningsLayer({
             </g>
           );
         }
+        if (o.kind === "passage") {
+          return (
+            <g key={o.id} className="plan-passage">
+              <rect
+                x={across.x}
+                y={across.y}
+                width={across.w}
+                height={across.d}
+                className="plan-door-gap"
+              />
+            </g>
+          );
+        }
         const s = doorSwing(o, t);
         const sweep = sweepFlag(o);
         return (

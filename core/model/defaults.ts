@@ -8,10 +8,18 @@ import {
   type Project,
   type ProjectSettings,
   type Style,
+  type Trim,
   type Version,
 } from "./types";
 
 export const DEFAULT_FLOOR_HEIGHT = 260;
+
+export const DEFAULT_TRIM: Trim = {
+  skirting: { style: "flat", height: 7, color: "#FBF9F4" },
+  cornice: "none",
+  rosette: false,
+  frameColor: "#FBF9F4",
+};
 
 export const DEFAULT_STYLE: Style = {
   name: "Huidig",
@@ -19,6 +27,7 @@ export const DEFAULT_STYLE: Style = {
   floor: { kind: "current", color: "#C9B8A0" },
   ceiling: "#FBF9F4",
   accent: "#87A08C",
+  trim: DEFAULT_TRIM,
 };
 
 export function defaultSettings(): ProjectSettings {
@@ -33,6 +42,9 @@ export function defaultSettings(): ProjectSettings {
     snapToGrid: true,
     clearance: 80,
     layers,
+    northAngle: 0,
+    eyeHeight: 160,
+    showLife: true,
   };
 }
 
@@ -49,8 +61,11 @@ export function createVersion(
     openings: [],
     fixtures: [],
     items: [],
-    style: { ...DEFAULT_STYLE, wall: { ...DEFAULT_STYLE.wall }, floor: { ...DEFAULT_STYLE.floor } },
+    style: structuredClone(DEFAULT_STYLE),
     wallOverrides: {},
+    demolitions: [],
+    wallFlags: {},
+    moodboard: [],
   };
 }
 
@@ -83,5 +98,8 @@ export function createProject(name = "Nieuw project", now = new Date()): Project
     settings: defaultSettings(),
     floors: [floor],
     activeFloorId: floor.id,
+    photos: [],
+    looks: [],
+    customItems: [],
   };
 }

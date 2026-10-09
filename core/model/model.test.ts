@@ -466,3 +466,49 @@ describe("wall overrides and layers", () => {
     expect(validateProject(p).ok).toBe(true);
   });
 });
+
+describe("migration 1 -> 2", () => {
+  function v1Project() {
+    const p = structuredClone(createProject("Oud")) as unknown as Record<string, unknown>;
+    const floors = p.floors as Record<string, unknown>[];
+    const current = floors[0]!.current as Record<string, unknown>;
+    const style = current.style as Record<string, unknown>;
+    delete style.trim;
+    style.floor = { kind: "wood", color: "#C9B8A0" };
+    current.rooms = [
+      {
+        id: "r",
+        name: "Kamer",
+        type: "living",
+        shape: { kind: "rects", rects: [{ x: 0, y: 0, w: 100, d: 100 }] },
+        style: { floor: { kind: "wood" } },
+      },
+    ];
+    delete current.demolitions;
+    delete current.wallFlags;
+    delete current.moodboard;
+    const settings = p.settings as Record<string, unknown>;
+    delete settings.northAngle;
+    delete settings.eyeHeight;
+    delete settings.showLife;
+    delete p.photos;
+    delete p.looks;
+    delete p.customItems;
+    p.schemaVersion = 1;
+    return p;
+  }
+
+  it("fills the new fields and renames wood to planks", () => {
+    const result = loadProject(v1Project());
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.migratedFrom).toBe(1);
+    const v = getActiveVersion(result.project);
+    expect(v.style.floor.kind).toBe("planks");
+    expect(v.rooms[0]!.style?.floor?.kind).toBe("planks");
+    expect(v.style.trim.skirting.height).toBe(7);
+    expect(v.demolitions).toEqual([]);
+    expect(result.project.settings.eyeHeight).toBe(160);
+    expect(result.project.photos).toEqual([]);
+  });
+});

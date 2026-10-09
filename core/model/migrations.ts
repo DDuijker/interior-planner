@@ -10,6 +10,41 @@ import { SCHEMA_VERSION } from "./version";
  */
 export type Migration = (doc: Record<string, unknown>) => Record<string, unknown>;
 
+type Doc = Record<string, unknown>;
+const asDoc = (v: unknown): Doc => (typeof v === "object" && v !== null ? (v as Doc) : {});
+const asArray = (v: unknown): unknown[] => (Array.isArray(v) ? v : []);
+
+const TRIM_V2 = {
+  skirting: { style: "flat", height: 7, color: "#FBF9F4" },
+  cornice: "none",
+  rosette: false,
+  frameColor: "#FBF9F4",
+};
+
+/** v1 called straight planks "wood". */
+function floorFinishV2(f: unknown): unknown {
+  const finish = asDoc(f);
+  return finish.kind === "wood" ? { ...finish, kind: "planks" } : f;
+}
+
+function versionV2(v: unknown): Doc {
+  const ver = asDoc(v);
+  const style = asDoc(ver.style);
+  return {
+    ...ver,
+    style: { ...style, floor: floorFinishV2(style.floor), trim: style.trim ?? TRIM_V2 },
+    rooms: asArray(ver.rooms).map((r) => {
+      const room = asDoc(r);
+      const rs = room.style ? asDoc(room.style) : undefined;
+      if (!rs || !rs.floor) return room;
+      return { ...room, style: { ...rs, floor: floorFinishV2(rs.floor) } };
+    }),
+    demolitions: ver.demolitions ?? [],
+    wallFlags: ver.wallFlags ?? {},
+    moodboard: ver.moodboard ?? [],
+  };
+}
+
 export const MIGRATIONS: Readonly<Record<number, Migration>> = {
   // 0 -> 1: stamp unversioned documents and fill the fields that version 1 requires.
   0: (doc) => {
@@ -19,6 +54,26 @@ export const MIGRATIONS: Readonly<Record<number, Migration>> = {
       schemaVersion: 1,
       createdAt: typeof doc.createdAt === "string" ? doc.createdAt : now,
       updatedAt: typeof doc.updatedAt === "string" ? doc.updatedAt : now,
+    };
+  },
+  // 1 -> 2: style trim, floor patterns, renovation, photos, looks, custom items.
+  1: (doc) => {
+    const settings = asDoc(doc.settings);
+    return {
+      ...doc,
+      schemaVersion: 2,
+      settings: { northAngle: 0, eyeHeight: 160, showLife: true, ...settings },
+      floors: asArray(doc.floors).map((f) => {
+        const floor = asDoc(f);
+        return {
+          ...floor,
+          current: versionV2(floor.current),
+          designs: asArray(floor.designs).map(versionV2),
+        };
+      }),
+      photos: doc.photos ?? [],
+      looks: doc.looks ?? [],
+      customItems: doc.customItems ?? [],
     };
   },
 };
