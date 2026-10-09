@@ -3,7 +3,7 @@ import { createFixture } from "../fixtures/fixtures";
 import type { Item, Room, Wall } from "../model/types";
 import { createDoor, snapOpening } from "../openings/openings";
 import { generateWalls } from "../walls/generate";
-import { checkLayout, conflictingIds, itemFootprint, type LayoutInput } from "./collision";
+import { checkLayout, conflictingIds, itemFootprint, roomAt, type LayoutInput } from "./collision";
 
 function item(
   id: string,
@@ -192,5 +192,62 @@ describe("door swings", () => {
   it("works without a known wall", () => {
     const loose = { ...door, wallId: undefined };
     expect(types({ openings: [loose], items: [item("x", 120, 330, 30, 30)] })).toContain("door");
+  });
+});
+
+describe("rooms", () => {
+  const rooms: Room[] = [
+    {
+      id: "a",
+      name: "A",
+      type: "living",
+      shape: { kind: "rects", rects: [{ x: 0, y: 0, w: 400, d: 300 }] },
+    },
+    {
+      id: "b",
+      name: "B",
+      type: "bed",
+      shape: { kind: "rects", rects: [{ x: 400, y: 0, w: 300, d: 300 }] },
+    },
+  ];
+  const walls = generateWalls(rooms);
+
+  it("finds the room of a point", () => {
+    expect(roomAt(rooms, { x: 10, y: 10 })).toBe("a");
+    expect(roomAt(rooms, { x: 410, y: 10 })).toBe("b");
+    expect(roomAt(rooms, { x: -10, y: 10 })).toBeUndefined();
+    const tri: Room = {
+      ...rooms[0]!,
+      id: "t",
+      shape: {
+        kind: "polygon",
+        points: [
+          { x: 0, y: 0 },
+          { x: 50, y: 0 },
+          { x: 0, y: 50 },
+        ],
+      },
+    };
+    expect(roomAt([tri], { x: 5, y: 5 })).toBe("t");
+  });
+
+  it("skips clearance through a wall but still sees overlaps", () => {
+    const left = item("l", 350, 150, 40, 40); // 25 cm from the wall face, 50 cm from `right`
+    const right = item("r", 440, 150, 40, 40);
+    const without = checkLayout({ ...empty, walls, items: [left, right] });
+    expect(
+      without.some((i) => i.type === "clearance" && i.ids.includes("r") && i.ids.includes("l")),
+    ).toBe(true);
+    const withRooms = checkLayout({ ...empty, walls, rooms, items: [left, right] });
+    expect(withRooms.some((i) => i.ids.includes("r") && i.ids.includes("l"))).toBe(false);
+    // The wall on its own side still counts.
+    expect(withRooms.some((i) => i.type === "clearance" && i.ids[0] === "l")).toBe(true);
+    const overlapping = checkLayout({
+      ...empty,
+      walls,
+      rooms,
+      items: [left, item("o", 360, 150, 40, 40)],
+    });
+    expect(overlapping.map((i) => i.type)).toContain("overlap");
   });
 });

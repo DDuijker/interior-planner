@@ -9,7 +9,7 @@ import {
   type Polygon,
 } from "../geometry/polygon";
 import { fixtureFootprint } from "../fixtures/fixtures";
-import type { Door, Fixture, Id, Item, Opening, Point, Rect, Wall } from "../model/types";
+import type { Door, Fixture, Id, Item, Opening, Point, Rect, Room, Wall } from "../model/types";
 import { cutWalls, doorSwing, openingOnWall } from "../openings/openings";
 
 export type IssueType = "overlap" | "wall" | "clearance" | "door";
@@ -27,6 +27,11 @@ export interface LayoutInput {
   fixtures: readonly Fixture[];
   walls: readonly Wall[];
   openings: readonly Opening[];
+  /**
+   * Optional. When given, clearance is only checked between things in the
+   * same room (and walls bordering that room), not through walls.
+   */
+  rooms?: readonly Room[];
 }
 
 export interface LayoutOptions {
@@ -87,6 +92,21 @@ function pointPolygonDistance(p: Point, poly: Polygon): number {
   return best;
 }
 
+/** Id of the room containing `p`, if any (later rooms win, like the wall generator). */
+export function roomAt(rooms: readonly Room[], p: Point): Id | undefined {
+  for (let i = rooms.length - 1; i >= 0; i--) {
+    const room = rooms[i]!;
+    const inside =
+      room.shape.kind === "rects"
+        ? room.shape.rects.some(
+            (r) => p.x >= r.x && p.x <= r.x + r.w && p.y >= r.y && p.y <= r.y + r.d,
+          )
+        : pointInPolygon(p, room.shape.points);
+    if (inside) return room.id;
+  }
+  return undefined;
+}
+
 /**
  * Check a layout. Only floor-standing items are checked: stacked items sit
  * on something by design and wall items hang above the furniture.
@@ -97,9 +117,24 @@ export function checkLayout(
 ): LayoutIssue[] {
   const opts = { ...DEFAULT_LAYOUT_OPTIONS, ...options };
   const issues: LayoutIssue[] = [];
-  const items = input.items
-    .filter((i) => i.mount === "floor")
-    .map((i) => shape(i.id, itemFootprint(i)));
+  const rooms = input.rooms ?? [];
+  const floorItems = input.items.filter((i) => i.mount === "floor");
+  const roomOf = new Map<Id, Id | undefined>();
+  for (const i of floorItems) roomOf.set(i.id, roomAt(rooms, i));
+  for (const f of input.fixtures)
+    roomOf.set(f.id, roomAt(rooms, { x: f.x + f.w / 2, y: f.y + f.d / 2 }));
+  const wallRooms = new Map(input.walls.map((w) => [w.id, [w.rooms.a, w.rooms.b]]));
+  /** Can there be a passage between these two, or is there a wall in between? */
+  const sameSpace = (a: Id, b: Id) => {
+    if (rooms.length === 0) return true;
+    const ra = roomOf.get(a);
+    if (ra === undefined) return true;
+    const wr = wallRooms.get(b);
+    if (wr) return wr.includes(ra);
+    const rb = roomOf.get(b);
+    return rb === undefined || rb === ra;
+  };
+  const items = floorItems.map((i) => shape(i.id, itemFootprint(i)));
   const fixtures = input.fixtures.map((f) => shape(f.id, fixtureFootprint(f)));
   const wallPieces = cutWalls(input.walls, input.openings).map((p) =>
     shape(p.wallId, rectPolygon(p.rect)),
@@ -109,6 +144,7 @@ export function checkLayout(
   const compare = (a: Shape, b: Shape, hitType: IssueType) => {
     if (!rectsOverlap(grow(a.box, reach), b.box)) return null;
     if (convexOverlap(a.poly, b.poly, opts.tolerance)) return { type: hitType, gap: 0 };
+    if (!sameSpace(a.id, b.id)) return null;
     const gap = polygonDistance(a.poly, b.poly);
     if (gap >= opts.againstGap && gap < opts.clearance) return { type: "clearance" as const, gap };
     return null;
