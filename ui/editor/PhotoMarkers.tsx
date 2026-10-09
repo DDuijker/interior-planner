@@ -35,19 +35,18 @@ export const PhotoMarkers = memo(function PhotoMarkers({
         const wedge = `M${sp.at.x} ${sp.at.y}L${sp.at.x + a.x * len} ${sp.at.y + a.y * len}A${len} ${len} 0 0 1 ${sp.at.x + b.x * len} ${sp.at.y + b.y * len}Z`;
         const s = px(1);
         return (
-          <g
+          // An SVG link: focusable in every browser (WebKit does not focus a
+          // <g> with tabindex), and Enter activates it natively.
+          <a
             key={photo.id}
+            href={`#photo-${photo.id}`}
             className="plan-photo"
             data-photo={photo.id}
             role="button"
-            tabIndex={0}
             aria-label={label(photo)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                e.stopPropagation();
-                onOpen(photo.id);
-              }
+            onClick={(e) => {
+              e.preventDefault();
+              onOpen(photo.id);
             }}
           >
             <path d={wedge} className="plan-photo-wedge" />
@@ -64,7 +63,7 @@ export const PhotoMarkers = memo(function PhotoMarkers({
               strokeWidth={px(1.5)}
             />
             <title>{label(photo)}</title>
-          </g>
+          </a>
         );
       })}
     </g>
