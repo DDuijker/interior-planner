@@ -1,6 +1,6 @@
 import { orientedBox } from "../geometry/polygon";
 import { newId } from "../model/ids";
-import type { Fixture, FixtureType, Point } from "../model/types";
+import type { Fixture, FixtureType, Point, Rect } from "../model/types";
 
 export interface FixtureSpec {
   /** Default footprint, cm. `w` along the wall, `d` into the room. */
@@ -75,4 +75,24 @@ export function fixtureHeight(f: Fixture, floorHeight: number): number {
 /** Fixtures that pass through to the floor above (stairs) or the roof (chimney). */
 export function connectsFloors(type: FixtureType): boolean {
   return type === "stairs" || type === "chimney";
+}
+
+/**
+ * Stairs from a dragged rectangle. The run (steps) follows the longer side; a wide drag
+ * becomes a stair rotated 90 degrees around the same centre. Returns null when the
+ * rectangle is smaller than the minimum stair size.
+ */
+export function stairsFromRect(r: Rect): Fixture | null {
+  const { min } = FIXTURE_SPECS.stairs;
+  const wide = r.w > r.d;
+  const [w, d] = wide ? [r.d, r.w] : [r.w, r.d];
+  if (w < min.w || d < min.d) return null;
+  const size = clampFixtureSize("stairs", w, d);
+  const cx = r.x + r.w / 2;
+  const cy = r.y + r.d / 2;
+  return createFixture("stairs", cx - size.w / 2, cy - size.d / 2, {
+    ...size,
+    rotation: wide ? 90 : 0,
+    stair: { shape: "straight", up: "N" },
+  });
 }

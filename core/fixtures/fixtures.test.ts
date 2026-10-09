@@ -7,6 +7,7 @@ import {
   FIXTURE_SPECS,
   fixtureFootprint,
   fixtureHeight,
+  stairsFromRect,
 } from "./fixtures";
 import { addFixture, createProject, getActiveVersion, updateFixture } from "../model";
 
@@ -60,5 +61,27 @@ describe("fixtures", () => {
     expect(getActiveVersion(p).fixtures[0]).toMatchObject({ x: 0, w: 240 });
     p = updateFixture(updateFixture(p, "k", { locked: false }), "k", { x: 100, w: 300 });
     expect(getActiveVersion(p).fixtures[0]).toMatchObject({ x: 100, w: 300 });
+  });
+
+  it("makes stairs from a tall dragged rectangle", () => {
+    const f = stairsFromRect({ x: 100, y: 50, w: 90, d: 280 });
+    expect(f).toMatchObject({ type: "stairs", x: 100, y: 50, w: 90, d: 280, rotation: 0 });
+    expect(f?.stair).toEqual({ shape: "straight", up: "N" });
+  });
+
+  it("rotates stairs dragged wider than tall, keeping the same centre", () => {
+    const f = stairsFromRect({ x: 0, y: 0, w: 280, d: 90 })!;
+    expect(f).toMatchObject({ w: 90, d: 280, rotation: 90 });
+    const xs = fixtureFootprint(f).map((p) => p.x);
+    const ys = fixtureFootprint(f).map((p) => p.y);
+    expect(Math.min(...xs)).toBeCloseTo(0);
+    expect(Math.max(...xs)).toBeCloseTo(280);
+    expect(Math.min(...ys)).toBeCloseTo(0);
+    expect(Math.max(...ys)).toBeCloseTo(90);
+  });
+
+  it("refuses stairs that are too small", () => {
+    expect(stairsFromRect({ x: 0, y: 0, w: 30, d: 200 })).toBeNull();
+    expect(stairsFromRect({ x: 0, y: 0, w: 90, d: 50 })).toBeNull();
   });
 });

@@ -40,7 +40,7 @@ import {
 } from "@/core/draw/draw";
 import { pointInPolygon } from "@/core/geometry/polygon";
 import { rectFromPoints, rectContainsPoint } from "@/core/geometry/rect";
-import { fixtureFootprint } from "@/core/fixtures/fixtures";
+import { fixtureFootprint, stairsFromRect } from "@/core/fixtures/fixtures";
 import { dimensionLines, distance } from "@/core/measure/dimensions";
 import { formatLength, parseLength } from "@/core/measure/units";
 import { newId } from "@/core/model/ids";
@@ -49,6 +49,7 @@ import {
   addRoom,
   moveItems,
   updateActiveVersion,
+  addFixture,
   updateFixture,
   updateItems,
   updateOpening,
@@ -136,7 +137,7 @@ type Gesture =
   | { kind: "drawRect"; start: Point; current: Point };
 
 const HANDLES: Handle[] = ["n", "e", "s", "w", "ne", "nw", "se", "sw"];
-const DRAW_TOOLS = new Set(["room-rect", "room-l", "room-poly", "wall"]);
+const DRAW_TOOLS = new Set(["room-rect", "room-l", "room-poly", "wall", "stairs"]);
 
 /** Rect of an opening across its wall. */
 export function openingRect(o: Opening, walls: readonly Wall[]): Rect {
@@ -387,7 +388,7 @@ export function PlanCanvas({
       return;
     }
     if (tool === "door" || tool === "window" || tool === "passage") return placeOpening(world);
-    if (tool === "room-rect" || tool === "room-l") {
+    if (tool === "room-rect" || tool === "room-l" || tool === "stairs") {
       const start = snapP(world);
       gesture.current = { kind: "drawRect", start, current: start };
       return;
@@ -665,7 +666,14 @@ export function PlanCanvas({
       }
       case "drawRect": {
         setPreview(null);
-        if (tool === "room-rect") {
+        if (tool === "stairs") {
+          const stairs = stairsFromRect(rectFromPoints(g.start, g.current));
+          if (stairs) {
+            apply((p) => addFixture(p, stairs));
+            dispatch({ type: "tool", tool: "select" });
+            dispatch({ type: "pickFixture", fixture: stairs.id });
+          } else toast(t("draw.stairsTooSmall"), "warning");
+        } else if (tool === "room-rect") {
           const shape = rectRoomShape(g.start, g.current);
           if (shape) addNewRoom(shape);
           else toast(t("draw.tooSmall"), "warning");

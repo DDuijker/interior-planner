@@ -18,6 +18,7 @@ const DRAW_TOOLS: [Tool, IconName][] = [
   ["room-l", "floors"],
   ["room-poly", "polygon"],
   ["wall", "wall"],
+  ["stairs", "stairs"],
 ];
 
 const OPENING_TOOLS: [Tool, IconName][] = [

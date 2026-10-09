@@ -20,6 +20,7 @@ export type Tool =
   | "room-rect"
   | "room-l"
   | "room-poly"
+  | "stairs"
   | "wall"
   | "door"
   | "window"
