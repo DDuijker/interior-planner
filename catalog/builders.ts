@@ -631,7 +631,6 @@ export function vase({ w, d, h }: Dims, p: Params): Part[] {
     cyl(0, 0, 0, w * 0.6, d * 0.6, h * 0.6, "main"),
     ball(0, 0, h * 0.55, w, d, h * 0.45, "second"),
   ];
-  return parts;
 }
 
 export function candles({ w, d, h }: Dims, p: Params): Part[] {

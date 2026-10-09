@@ -25,10 +25,27 @@ function room(
 
 type ItemSpec = Pick<Item, "name" | "x" | "y" | "w" | "d" | "h"> & Partial<Item>;
 
+/** Sample item id -> catalog entry. */
+const CATALOG: Record<string, string> = {
+  sofa: "sofa-3",
+  "coffee-table": "coffee-table",
+  armchair: "armchair",
+  "tv-unit": "tv-unit",
+  "dining-table": "dining-round",
+  "floor-lamp": "lamp-floor",
+  plant: "plant-monstera",
+  vase: "vase-small",
+  painting: "painting-medium",
+  bed: "bed-160",
+  "nightstand-l": "nightstand",
+  "nightstand-r": "nightstand",
+  wardrobe: "wardrobe-sliding",
+};
+
 function item(id: string, spec: ItemSpec): Item {
   return {
     id,
-    catalogId: id,
+    catalogId: CATALOG[id] ?? id,
     rotation: 0,
     shape: "rect",
     layer: "furniture",
