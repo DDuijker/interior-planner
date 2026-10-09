@@ -1933,3 +1933,19 @@ button.swatch-dot.big {
   flex-direction: column;
   gap: var(--space-3);
 }
+.plan-photo-buttons {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.plan-photo-btn {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  margin: -22px 0 0 -22px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+}

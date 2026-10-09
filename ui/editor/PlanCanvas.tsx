@@ -92,7 +92,7 @@ import {
   WallsLayer,
 } from "./layers";
 import { Minimap } from "./Minimap";
-import { PhotoMarkers } from "./PhotoMarkers";
+import { PhotoMarkerButtons, PhotoMarkers } from "./PhotoMarkers";
 import type { EditorAction, EditorState } from "./state";
 
 export type ContextTarget = {
@@ -920,14 +920,7 @@ export function PlanCanvas({
             <RoomLabels rooms={version.rooms} unit={unit} px={px} names={roomName} />
           )}
           {linkedPhotos.length > 0 && (
-            <PhotoMarkers
-              photos={linkedPhotos}
-              rooms={version.rooms}
-              walls={walls}
-              px={px}
-              label={(p) => t("photos.marker", { name: p.name })}
-              onOpen={(id) => dispatch({ type: "openPhoto", photo: id, view: "photos" })}
-            />
+            <PhotoMarkers photos={linkedPhotos} rooms={version.rooms} walls={walls} px={px} />
           )}
           {selection.map((id) => {
             const item = version.items.find((i) => i.id === id);
@@ -1210,6 +1203,16 @@ export function PlanCanvas({
             </form>
           )}
         </div>
+      )}
+      {linkedPhotos.length > 0 && (
+        <PhotoMarkerButtons
+          photos={linkedPhotos}
+          rooms={version.rooms}
+          walls={walls}
+          camera={camera}
+          label={(p) => t("photos.marker", { name: p.name })}
+          onOpen={(id) => dispatch({ type: "openPhoto", photo: id, view: "photos" })}
+        />
       )}
       {state.showMinimap && size.w > 0 && (
         <Minimap

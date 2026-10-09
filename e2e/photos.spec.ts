@@ -46,8 +46,9 @@ test("adds a photo, gets a palette, links it and opens it from the plan", async 
   await page.getByRole("combobox", { name: /^Looks towards/ }).selectOption("N");
   await page.getByRole("button", { name: "Show on plan" }).click();
 
-  const marker = page.locator("[data-photo]");
-  await expect(marker).toHaveCount(1);
+  await expect(page.locator("[data-photo]")).toHaveCount(1);
+  // The control is a real button over the icon, focusable in every engine.
+  const marker = page.getByRole("button", { name: "Photo room" });
   await marker.focus();
   await expect(marker).toBeFocused();
   await page.keyboard.press("Enter");
