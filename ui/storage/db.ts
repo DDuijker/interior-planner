@@ -31,9 +31,16 @@ export interface BackupRecord {
   data: unknown;
 }
 
+/**
+ * A stored image. New records keep the bytes as an ArrayBuffer: WebKit
+ * (Safari private mode, and the Playwright WebKit context) cannot store a
+ * Blob in IndexedDB. Older records may still hold a Blob.
+ */
 export interface PhotoRecord {
   id: Id;
-  blob: Blob;
+  bytes?: ArrayBuffer;
+  type?: string;
+  blob?: Blob;
 }
 
 let dbPromise: Promise<IDBDatabase> | null = null;
@@ -165,9 +172,11 @@ export async function listBackups(projectId: Id): Promise<BackupRecord[]> {
 }
 
 export async function putPhoto(id: Id, blob: Blob): Promise<void> {
+  // Read the bytes before opening the transaction: it closes on await.
+  const bytes = await blob.arrayBuffer();
   const db = await openDb();
   const tx = db.transaction("photos", "readwrite");
-  tx.objectStore("photos").put({ id, blob } satisfies PhotoRecord);
+  tx.objectStore("photos").put({ id, bytes, type: blob.type } satisfies PhotoRecord);
   await done(tx);
 }
 
@@ -176,7 +185,9 @@ export async function getPhoto(id: Id): Promise<Blob | undefined> {
   const r = await req(
     db.transaction("photos").objectStore("photos").get(id) as IDBRequest<PhotoRecord | undefined>,
   );
-  return r?.blob;
+  if (!r) return undefined;
+  if (r.bytes) return new Blob([r.bytes], { type: r.type ?? "" });
+  return r.blob;
 }
 
 export async function deletePhoto(id: Id): Promise<void> {

@@ -52,8 +52,9 @@ describe("project storage", () => {
   it("stores photo blobs", async () => {
     await putPhoto("ph1", new Blob(["abc"], { type: "image/webp" }));
     const blob = await getPhoto("ph1");
-    // jsdom blobs lose their content through structuredClone; the record itself must survive.
-    expect(blob).toBeDefined();
+    // Stored as bytes (WebKit cannot keep a Blob in IndexedDB), so content and type survive.
+    expect(blob?.type).toBe("image/webp");
+    expect(await blob?.text()).toBe("abc");
     await deletePhoto("ph1");
     expect(await getPhoto("ph1")).toBeUndefined();
   });
