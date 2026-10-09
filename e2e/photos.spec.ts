@@ -49,6 +49,7 @@ test("adds a photo, gets a palette, links it and opens it from the plan", async 
   const marker = page.locator("[data-photo]");
   await expect(marker).toHaveCount(1);
   await marker.focus();
+  await expect(marker).toBeFocused();
   await page.keyboard.press("Enter");
   await expect(page.getByRole("tab", { name: "Photos", selected: true })).toBeVisible();
   expect(errors).toEqual([]);

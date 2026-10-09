@@ -43,10 +43,19 @@ export const PhotoMarkers = memo(function PhotoMarkers({
             className="plan-photo"
             data-photo={photo.id}
             role="button"
+            tabIndex={0}
             aria-label={label(photo)}
             onClick={(e) => {
               e.preventDefault();
               onOpen(photo.id);
+            }}
+            onKeyDown={(e) => {
+              // Not every engine activates an SVG link on Enter; do it ourselves.
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                e.stopPropagation();
+                onOpen(photo.id);
+              }
             }}
           >
             <path d={wedge} className="plan-photo-wedge" />
